@@ -3,15 +3,15 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
 
 //import component
-import Login from "./components/auth/login";
-import Register from "./components/auth/signup";
+import Login from "./components/auth/Login";
+import Landing from "./components/common/Landing";
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route exact path="/" component={Login} />
-        <Route exact path="/register" component={Register} />
+        <Route exact path="/landing" component={Landing} />
       </Switch>
     </Router>
   );
