@@ -7,6 +7,7 @@ module.exports = function validateSignupInput(data) {
   data.fname = !isEmpty(data.fname) ? data.fname : "";
   data.lname = !isEmpty(data.lname) ? data.lname : "";
   data.email = !isEmpty(data.email) ? data.email : "";
+  data.role = !isEmpty(data.role) ? data.role : "";
   data.password = !isEmpty(data.password) ? data.password : "";
 
   if (!Validator.isLength(data.fname, { min: 2, max: 30 })) {
@@ -20,6 +21,9 @@ module.exports = function validateSignupInput(data) {
   }
   if (Validator.isEmpty(data.lname)) {
     errors.lname = "Last Name field is required";
+  }
+  if (Validator.isEmpty(data.role)) {
+    errors.role = "Role field is required";
   }
   if (!Validator.isEmail(data.email)) {
     errors.email = "Email is invalid";
