@@ -6,7 +6,7 @@ import "./App.scss";
 import Login from "./components/auth/Login";
 import Landing from "./components/common/Landing";
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <Switch>
@@ -15,6 +15,6 @@ function App() {
       </Switch>
     </Router>
   );
-}
+};
 
 export default App;

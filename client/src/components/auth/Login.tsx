@@ -1,21 +1,31 @@
 import React, { useState } from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
+
+import { History, LocationState } from "history";
 
 import { authenticate, isAuth } from "../../utils/common/helpers";
 
 import "./auth.scss";
 
-const Login = ({ history }) => {
+interface LoginComponentProps {
+  someOfYourOwnProps: any;
+  history: History<LocationState>;
+  someMorePropsIfNeedIt: any;
+}
+
+const Login = (props: LoginComponentProps) => {
   const [values, setValues] = useState({
     email: "",
     password: ""
   });
-  const handleChange = name => event => {
-    setValues({ ...values, [name]: event.target.value });
+  const handleChange = (name: string) => (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    setValues({ ...values, [name]: event.currentTarget.value });
     console.log(values);
   };
-  const handleSubmit = event => {
+  const handleSubmit = (event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
     const userData = {
       email,
@@ -26,7 +36,9 @@ const Login = ({ history }) => {
       .then(res => {
         console.log(res);
         authenticate(res, () => {
-          isAuth() ? history.push("/landing") : history.push("/landing");
+          isAuth()
+            ? props.history.push("/landing")
+            : props.history.push("/landing");
         });
         //history.push('/landing')
       })
@@ -36,11 +48,11 @@ const Login = ({ history }) => {
   };
   const { email, password } = values;
   return (
-    <div className="container login">
+    <div className="login">
       <div className="d-flex justify-content-center h-100">
         <div className="card">
           <div className="card-header text-center">
-            <h3>Sign In</h3>
+            <h2>Sign In</h2>
           </div>
           <div className="card-body">
             <form>
@@ -85,7 +97,9 @@ const Login = ({ history }) => {
           </div>
           <div className="card-footer">
             <div className="d-flex justify-content-center">
-              <Link to="#">Forgot your password?</Link>
+              <Link to="#">
+                <b>Forgot your password?</b>{" "}
+              </Link>
             </div>
           </div>
         </div>
@@ -94,4 +108,4 @@ const Login = ({ history }) => {
   );
 };
 
-export default withRouter(Login);
+export default Login;
