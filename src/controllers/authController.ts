@@ -3,18 +3,31 @@ import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcryptjs";
 import Validator from "validator";
 
+import { JWT_SECRET } from "../config/constants";
+
 //import validator
 import isEmpty from "../validator/is-empty";
 
 //import user model
 import User from "../models/User";
 
+interface userData {
+  fname: string;
+  lname: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 export class authController {
   //Register Controller
   Register = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateRegisterInput(req.body);
+    console.log(errors);
+    console.log(isValid);
+
     //Check Validation
-    if (!isValid) {
+    if (isValid.includes(false)) {
       return res.status(400).json(errors);
     }
     //Register Controller
@@ -36,12 +49,13 @@ export class authController {
             newUser
               .save()
               .then(user => res.json(user))
-              .catch(err =>
+              .catch(err => {
+                console.log(err);
                 res.json({
                   error:
                     "Error in saving user to database, please signup again."
-                })
-              );
+                });
+              });
           });
         });
       }
@@ -50,11 +64,10 @@ export class authController {
   //Login Controller
   Login = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateLoginInput(req.body);
-    console.log(Object.values(errors).length === 0);
-    console.log(req.body);
+    console.log(isValid);
 
     //Check Validation
-    if (!isValid) {
+    if (isValid.includes(false)) {
       return res.status(400).json(errors);
     }
     const { email, password } = req.body;
@@ -81,7 +94,7 @@ export class authController {
                 _id: user._id,
                 role: user.role
               },
-              process.env.JWT_SECRET,
+              JWT_SECRET,
               {
                 expiresIn: "24h"
               }
@@ -181,11 +194,4 @@ export class authController {
       isValid: isEmpty(errors)
     };
   };
-}
-interface userData {
-  fname: string;
-  lname: string;
-  email: string;
-  password: string;
-  role: string;
 }
