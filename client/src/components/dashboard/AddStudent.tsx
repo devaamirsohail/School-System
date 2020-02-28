@@ -1,18 +1,66 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-//DatePicker
-import DatePicker from "react-date-picker";
+import NumberFormat from "react-number-format";
+//Helpers
+import { getCookie } from "../../utils/common/helpers";
 
 import SideBar from "../common/SideBar";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 
 const AddStudent = () => {
-  const [admissionDate, setAdmissionDate] = useState(new Date());
+  const [studentData, setStudentData] = useState({
+    name: "",
+    fatherName: "",
+    DOB: "",
+    dateOfAdmission: "",
+    placeOfBirth: "",
+    sex: "male",
+    nationality: "",
+    address: "",
+    telephone: "",
+    mobile: "",
+    classes: "1st Class"
+  });
 
-  const handleChange = (date: any) => {
-    setAdmissionDate(date);
+  const {
+    name,
+    fatherName,
+    DOB,
+    dateOfAdmission,
+    placeOfBirth,
+    sex,
+    nationality,
+    address,
+    telephone,
+    mobile,
+    classes
+  } = studentData;
+
+  const handleChange = (name: string) => (
+    event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setStudentData({ ...studentData, [name]: event.currentTarget.value });
+  };
+  const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const token = getCookie("token");
+    axios({
+      method: "POST",
+      url: `${process.env.REACT_APP_API}/api/addstudent`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: studentData
+    })
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   return (
@@ -53,160 +101,192 @@ const AddStudent = () => {
                   <div className="row">
                     {/* left column */}
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputEmail1">Name</label>
+                      <label>Name</label>
                       <input
                         type="text"
                         className="form-control"
-                        id="exampleInputEmail1"
                         placeholder="Name"
+                        value={name}
+                        onChange={handleChange("name")}
                       />
                     </div>
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Father Name</label>
+                      <label>Father Name</label>
                       <input
                         type="text"
                         className="form-control"
-                        id="exampleInputPassword1"
                         placeholder="Father Name"
+                        value={fatherName}
+                        onChange={handleChange("fatherName")}
                       />
                     </div>
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Class</label>
+                      <label>Nationality</label>
                       <input
                         type="text"
                         className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Class"
+                        placeholder="Nationality"
+                        value={nationality}
+                        onChange={handleChange("nationality")}
                       />
                     </div>
                   </div>
                   <div className="row">
                     {/* left column */}
                     <div className="form-group col-md-4">
-                      <label>Admission Date:</label>
+                      <label>Place of Birth</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Place of Birth"
+                        value={placeOfBirth}
+                        onChange={handleChange("placeOfBirth")}
+                      />
+                    </div>
+                    <div className="form-group col-md-8">
+                      <label>Address</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Address"
+                        value={address}
+                        onChange={handleChange("address")}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    {/* left column */}
+                    <div className="form-group col-md-4">
+                      <label>Sex</label>
+                      <div className="form-group clearfix row">
+                        <div className="icheck-primary d-inline col-4">
+                          <input
+                            type="radio"
+                            name="sex"
+                            defaultChecked
+                            id="radioSuccess1"
+                            value="male"
+                            onClick={handleChange("sex")}
+                          />
+                          <label htmlFor="radioSuccess1">Male</label>
+                        </div>
+                        <div className="icheck-primary d-inline col-4">
+                          <input
+                            type="radio"
+                            name="sex"
+                            value="female"
+                            id="radioSuccess3"
+                            onClick={handleChange("sex")}
+                          />
+                          <label htmlFor="radioSuccess3">Female</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-group col-md-4">
+                      <label>Date of Birth:</label>
                       <div className="input-group">
-                        <DatePicker
+                        <div className="input-group-prepend">
+                          <span className="input-group-text">
+                            <i className="far fa-calendar-alt" />
+                          </span>
+                        </div>
+                        <NumberFormat
                           className="form-control"
-                          value={admissionDate}
-                          onChange={handleChange}
+                          format="##-##-####"
+                          placeholder="DD-MM-YYYY"
+                          mask={["D", "D", "M", "M", "Y", "Y", "Y", "Y"]}
+                          value={DOB}
+                          onChange={handleChange("DOB")}
                         />
                       </div>
+
                       {/* /.input group */}
                     </div>
 
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Father Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Father Name"
-                      />
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Class</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Class"
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    {/* left column */}
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputEmail1">Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputEmail1"
-                        placeholder="Name"
-                      />
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Father Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Father Name"
-                      />
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Class</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Class"
-                      />
+                      <label>Date of Admission</label>
+                      <div className="input-group">
+                        <div className="input-group-prepend">
+                          <span className="input-group-text">
+                            <i className="far fa-calendar-alt" />
+                          </span>
+                        </div>
+                        <NumberFormat
+                          className="form-control"
+                          format="##-##-####"
+                          placeholder="DD-MM-YYYY"
+                          mask={["D", "D", "M", "M", "Y", "Y", "Y", "Y"]}
+                          value={dateOfAdmission}
+                          onChange={handleChange("dateOfAdmission")}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="row">
                     {/* left column */}
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputEmail1">Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputEmail1"
-                        placeholder="Name"
-                      />
+                      <label>Telephone</label>
+                      <div className="input-group">
+                        <div className="input-group-prepend">
+                          <span className="input-group-text">
+                            <i className="fas fa-phone" />
+                          </span>
+                        </div>
+                        <NumberFormat
+                          className="form-control"
+                          format="### ### ####"
+                          mask="_"
+                          value={telephone}
+                          onChange={handleChange("telephone")}
+                        />
+                      </div>
                     </div>
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Father Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Father Name"
-                      />
+                      <label>Mobile</label>
+                      <div className="input-group">
+                        <div className="input-group-prepend">
+                          <span className="input-group-text">
+                            <i className="fas fa-mobile-alt"></i>
+                          </span>
+                        </div>
+                        <NumberFormat
+                          className="form-control"
+                          format="#### ### ####"
+                          mask="_"
+                          value={mobile}
+                          onChange={handleChange("mobile")}
+                        />
+                      </div>
                     </div>
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Class</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Class"
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    {/* left column */}
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputEmail1">Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputEmail1"
-                        placeholder="Name"
-                      />
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Father Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Father Name"
-                      />
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputPassword1">Class</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputPassword1"
-                        placeholder="Class"
-                      />
+                      <label>Class</label>
+                      <select
+                        onChange={handleChange("classes")}
+                        className="form-control "
+                        value={classes}
+                      >
+                        <option value="1st Class">1st Class</option>
+                        <option value="2nd Class">2nd Class</option>
+                        <option value="3th Class">3th Class</option>
+                        <option value="4th Class">4th Class</option>
+                        <option value="5th Class">5th Class</option>
+                        <option value="6th Class">6th Class</option>
+                        <option value="7th Class">7th Class</option>
+                        <option value="8th Class">8th Class</option>
+                        <option value="9th Class">9th Class</option>
+                        <option value="10th Class">10th Class</option>
+                      </select>
                     </div>
                   </div>
                 </div>
                 {/* /.card-body */}
                 <div className="card-footer">
-                  <button type="submit" className="btn btn-success">
+                  <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="btn btn-success"
+                  >
                     Add
                   </button>
                 </div>
