@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useReducer } from "react";
 import axios from "axios";
 
 import { History, LocationState } from "history";
 
 import { authenticate, isAuth } from "../../utils/common/helpers";
-
-import "./auth.scss";
+import { authReducer, initialState } from "../../context/authReducer";
+import { SET_CURRENT_USER } from "../../context/types";
 
 interface LoginComponentProps {
   someOfYourOwnProps: any;
@@ -16,14 +15,16 @@ interface LoginComponentProps {
 
 const Login = (props: LoginComponentProps) => {
   const [values, setValues] = useState({
-    email: "",
-    password: ""
+    email: "teacher@test2.com",
+    password: "123456"
   });
+  // const context = useContext(authContext);
+  const [state, dispatch] = useReducer(authReducer, initialState);
+
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement>
   ) => {
     setValues({ ...values, [name]: event.currentTarget.value });
-    console.log(values);
   };
   const handleSubmit = (event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -34,11 +35,13 @@ const Login = (props: LoginComponentProps) => {
     axios
       .post(`${process.env.REACT_APP_API}/api/login`, userData)
       .then(res => {
-        console.log(res);
+        dispatch({
+          type: SET_CURRENT_USER,
+          payload: res.data.user
+        });
+
         authenticate(res, () => {
-          isAuth()
-            ? props.history.push("/landing")
-            : props.history.push("/landing");
+          isAuth() ? props.history.push("/dashboard") : props.history.push("/");
         });
         //history.push('/landing')
       })
@@ -47,21 +50,20 @@ const Login = (props: LoginComponentProps) => {
       });
   };
   const { email, password } = values;
+
   return (
-    <div className="login">
-      <div className="d-flex justify-content-center h-100">
+    <div className="hold-transition login-page">
+      <div className="login-box">
+        <div className="login-logo">
+          <a href="../../index2.html">
+            <b>School</b>System
+          </a>
+        </div>
         <div className="card">
-          <div className="card-header text-center">
-            <h2>Sign In</h2>
-          </div>
-          <div className="card-body">
+          <div className="card-body login-card-body">
+            <p className="login-box-msg">Sign in to start your session</p>
             <form>
-              <div className="input-group form-group">
-                <div className="input-group-prepend">
-                  <span className="input-group-text">
-                    <i className="fas fa-user"></i>
-                  </span>
-                </div>
+              <div className="input-group mb-3">
                 <input
                   type="text"
                   className="form-control"
@@ -69,13 +71,13 @@ const Login = (props: LoginComponentProps) => {
                   value={email}
                   onChange={handleChange("email")}
                 />
-              </div>
-              <div className="input-group form-group">
-                <div className="input-group-prepend">
-                  <span className="input-group-text">
-                    <i className="fas fa-key"></i>
-                  </span>
+                <div className="input-group-append">
+                  <div className="input-group-text">
+                    <span className="fas fa-envelope" />
+                  </div>
                 </div>
+              </div>
+              <div className="input-group mb-3">
                 <input
                   type="password"
                   className="form-control"
@@ -83,24 +85,21 @@ const Login = (props: LoginComponentProps) => {
                   value={password}
                   onChange={handleChange("password")}
                 />
+                <div className="input-group-append">
+                  <div className="input-group-text">
+                    <span className="fas fa-lock" />
+                  </div>
+                </div>
               </div>
-
-              <div className="form-group">
+              <div className="row">
                 <input
                   type="submit"
                   value="Login"
-                  className="btn float-center btn-block login_btn"
+                  className="btn float-center btn-block btn-primary"
                   onClick={handleSubmit}
                 />
               </div>
             </form>
-          </div>
-          <div className="card-footer">
-            <div className="d-flex justify-content-center">
-              <Link to="#">
-                <b>Forgot your password?</b>{" "}
-              </Link>
-            </div>
           </div>
         </div>
       </div>
