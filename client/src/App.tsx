@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
 
-import { isAuth } from "./utils/common/helpers";
 import PrivateRoute from "./components/common/PrivateRoute";
 
 //import component

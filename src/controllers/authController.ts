@@ -23,8 +23,6 @@ export class authController {
   //Register Controller
   Register = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateRegisterInput(req.body);
-    console.log(errors);
-    console.log(isValid);
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -64,7 +62,6 @@ export class authController {
   //Login Controller
   Login = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateLoginInput(req.body);
-    console.log(isValid);
 
     //Check Validation
     if (isValid.includes(false)) {

@@ -15,6 +15,7 @@
   "author": "Aamir Sohail",
   "license": "ISC",
   "dependencies": {
+    "@types/express-jwt": "0.0.42",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

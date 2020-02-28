@@ -1,24 +1,23 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useContext } from "react";
 import axios from "axios";
 
 import { History, LocationState } from "history";
 
 import { authenticate, isAuth } from "../../utils/common/helpers";
+import authContext from "../../context/authContext";
 import { authReducer, initialState } from "../../context/authReducer";
 import { SET_CURRENT_USER } from "../../context/types";
+import { Redirect } from "react-router-dom";
 
 interface LoginComponentProps {
-  someOfYourOwnProps: any;
   history: History<LocationState>;
-  someMorePropsIfNeedIt: any;
 }
 
 const Login = (props: LoginComponentProps) => {
   const [values, setValues] = useState({
-    email: "teacher@test2.com",
+    email: "test@test.com",
     password: "123456"
   });
-  // const context = useContext(authContext);
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const handleChange = (name: string) => (
@@ -50,8 +49,7 @@ const Login = (props: LoginComponentProps) => {
       });
   };
   const { email, password } = values;
-
-  return (
+  const signinForm = () => (
     <div className="hold-transition login-page">
       <div className="login-box">
         <div className="login-logo">
@@ -105,6 +103,9 @@ const Login = (props: LoginComponentProps) => {
       </div>
     </div>
   );
+  const renderFinal = isAuth() ? <Redirect to="/dashboard" /> : signinForm();
+
+  return <React.Fragment>{renderFinal}</React.Fragment>;
 };
 
 export default Login;

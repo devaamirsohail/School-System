@@ -9,7 +9,7 @@ export const initialState = {
 export const authReducer = (state: any, action: any) => {
   switch (action.type) {
     case SET_CURRENT_USER:
-      console.log("SET_CURRENT_USER", state);
+      console.log("SET_CURRENT_USER", action);
       return {
         ...state,
         isAuthenticated: true,

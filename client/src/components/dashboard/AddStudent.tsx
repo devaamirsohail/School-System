@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+//DatePicker
+import DatePicker from "react-date-picker";
 
 import SideBar from "../common/SideBar";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 
 const AddStudent = () => {
+  const [admissionDate, setAdmissionDate] = useState(new Date());
+
+  const handleChange = (date: any) => {
+    setAdmissionDate(date);
+  };
+
   return (
     <React.Fragment>
       <Header />
@@ -74,14 +83,17 @@ const AddStudent = () => {
                   <div className="row">
                     {/* left column */}
                     <div className="form-group col-md-4">
-                      <label htmlFor="exampleInputEmail1">Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleInputEmail1"
-                        placeholder="Name"
-                      />
+                      <label>Admission Date:</label>
+                      <div className="input-group">
+                        <DatePicker
+                          className="form-control"
+                          value={admissionDate}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      {/* /.input group */}
                     </div>
+
                     <div className="form-group col-md-4">
                       <label htmlFor="exampleInputPassword1">Father Name</label>
                       <input
