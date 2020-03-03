@@ -49,7 +49,7 @@ const AddStudent = () => {
     const token = getCookie("token");
     axios({
       method: "POST",
-      url: `${process.env.REACT_APP_API}/api/addstudent`,
+      url: `${process.env.REACT_APP_API}/api/student/add`,
       headers: {
         Authorization: `Bearer ${token}`
       },

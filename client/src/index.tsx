@@ -27,12 +27,12 @@ const Index = () => {
         <Redirect to="/" /> && signout();
         state.isAuthenticated = false;
         state.user = {};
-        state.loading = false;
       } else {
         state.isAuthenticated = true;
         state.user = user;
-        state.loading = false;
       }
+    } else {
+      signout();
     }
   }, []);
 

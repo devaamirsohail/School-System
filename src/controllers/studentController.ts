@@ -29,9 +29,6 @@ export class studentController {
   //Add Student Controller
   AddStudent = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateAddStudentInput(req.body);
-    console.log(errors);
-    console.log(isValid);
-    console.log(new Date(req.body.DOB));
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -74,6 +71,109 @@ export class studentController {
           error: "Error in saving student to database, try again."
         });
       });
+  };
+
+  //Get All Student Controller
+  GetAllStudents = (req: Request, res: Response) => {
+    Student.find(
+      {},
+      {
+        name: 1,
+        fatherName: 1,
+        DOB: 1,
+        sex: 1,
+        address: 1,
+        mobile: 1,
+        classes: 1
+      }
+    )
+
+      .then(students => {
+        if (!students) {
+          return res.status(404).json({
+            error: "There are no students"
+          });
+        }
+        res.json(students);
+      })
+      .catch(err => res.status(404).json(err));
+  };
+  //Get Single Student Controller
+  GetStudent = (req: Request, res: Response) => {
+    Student.findById(req.query.id, {
+      name: 1,
+      fatherName: 1,
+      DOB: 1,
+      sex: 1,
+      address: 1,
+      mobile: 1,
+      classes: 1
+    })
+
+      .then(student => {
+        if (!student) {
+          return res.status(404).json({
+            error: "Something went wrong, Try again!"
+          });
+        }
+        res.json(student);
+      })
+      .catch(err => res.status(404).json(err));
+  };
+
+  //Update Student Controller
+  UpdateStudent = (req: Request, res: Response) => {
+    const { errors, isValid } = this.validateAddStudentInput(req.body);
+
+    //Check Validation
+    if (isValid.includes(false)) {
+      return res.status(400).json(errors);
+    }
+
+    const {
+      name,
+      fatherName,
+      placeOfBirth,
+      sex,
+      nationality,
+      address,
+      telephone,
+      mobile,
+      classes
+    } = req.body;
+    const DOB = new Date(req.body.DOB);
+    const dateOfAdmission = new Date(req.body.dateOfAdmission);
+    const studentFields = {
+      name,
+      fatherName,
+      DOB,
+      dateOfAdmission,
+      placeOfBirth,
+      sex,
+      nationality,
+      address,
+      telephone,
+      mobile,
+      classes
+    };
+
+    Student.findByIdAndUpdate(
+      req.query.id,
+      { $set: studentFields },
+      { new: true }
+    )
+      .then(student => {
+        res.json(student);
+      })
+      .catch(err => res.status(404).json(err));
+  };
+  //Delete Student Controller
+  DeleteStudent = (req: Request, res: Response) => {
+    Student.findByIdAndDelete(req.query.id)
+      .then(() => {
+        res.json({ success: true });
+      })
+      .catch(err => res.status(404).json(err));
   };
 
   //Validate Add Student Inputs

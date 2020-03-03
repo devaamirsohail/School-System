@@ -8,6 +8,7 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import Login from "./components/auth/Login";
 import Main from "./components/dashboard/Main";
 import AddStudent from "./components/dashboard/AddStudent";
+import Student from "./components/dashboard/Student";
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Route exact path="/" component={Login} />
         <PrivateRoute exact path="/dashboard" component={Main} />
         <PrivateRoute exact path="/addstudent" component={AddStudent} />
+        <PrivateRoute exact path="/students" component={Student} />
       </Switch>
     </Router>
   );

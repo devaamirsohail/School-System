@@ -4,9 +4,8 @@ import axios from "axios";
 import { History, LocationState } from "history";
 
 import { authenticate, isAuth } from "../../utils/common/helpers";
+import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
-import { authReducer, initialState } from "../../context/authReducer";
-import { SET_CURRENT_USER } from "../../context/types";
 import { Redirect } from "react-router-dom";
 
 interface LoginComponentProps {
@@ -18,7 +17,8 @@ const Login = (props: LoginComponentProps) => {
     email: "test@test.com",
     password: "123456"
   });
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const context = useContext(authContext);
+  const [state] = useReducer(authReducer, context);
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement>
@@ -34,11 +34,8 @@ const Login = (props: LoginComponentProps) => {
     axios
       .post(`${process.env.REACT_APP_API}/api/login`, userData)
       .then(res => {
-        dispatch({
-          type: SET_CURRENT_USER,
-          payload: res.data.user
-        });
-
+        state.isAuthenticated = true;
+        state.user = res.data.user;
         authenticate(res, () => {
           isAuth() ? props.history.push("/dashboard") : props.history.push("/");
         });
