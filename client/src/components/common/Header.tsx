@@ -17,8 +17,8 @@ const Header = () => {
           </Link>
         </li>
         <li className="nav-item d-none d-sm-inline-block">
-          <Link to="/addstudent" className="nav-link">
-            Contact
+          <Link to="/students" className="nav-link">
+            Students
           </Link>
         </li>
       </ul>
@@ -35,7 +35,7 @@ const Header = () => {
               {/* Message Start */}
               <div className="media">
                 <img
-                  src="dist/img/user1-128x128.jpg"
+                  src="/dist/img/user1-128x128.jpg"
                   alt="User Avatar"
                   className="img-size-50 mr-3 img-circle"
                 />
@@ -59,7 +59,7 @@ const Header = () => {
               {/* Message Start */}
               <div className="media">
                 <img
-                  src="dist/img/user8-128x128.jpg"
+                  src="/dist/img/user8-128x128.jpg"
                   alt="User Avatar"
                   className="img-size-50 img-circle mr-3"
                 />
@@ -83,7 +83,7 @@ const Header = () => {
               {/* Message Start */}
               <div className="media">
                 <img
-                  src="dist/img/user3-128x128.jpg"
+                  src="/dist/img/user3-128x128.jpg"
                   alt="User Avatar"
                   className="img-size-50 img-circle mr-3"
                 />

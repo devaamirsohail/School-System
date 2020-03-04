@@ -11,19 +11,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import Student from "../models/Student";
 
-interface studentData {
-  name: string;
-  fatherName: string;
-  DOB: string;
-  dateOfAdmission: string;
-  placeOfBirth: string;
-  sex: string;
-  nationality: string;
-  address: string;
-  telephone: string;
-  mobile: string;
-  classes: string;
-}
+import { IStudent } from "../models/Student";
 
 export class studentController {
   //Add Student Controller
@@ -44,10 +32,10 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes
+      classes,
+      DOB,
+      dateOfAdmission
     } = req.body;
-    const DOB = new Date(req.body.DOB);
-    const dateOfAdmission = new Date(req.body.dateOfAdmission);
     const newStudent = new Student({
       name,
       fatherName,
@@ -107,13 +95,17 @@ export class studentController {
       sex: 1,
       address: 1,
       mobile: 1,
-      classes: 1
+      classes: 1,
+      telephone: 1,
+      nationality: 1,
+      dateOfAdmission: 1,
+      placeOfBirth: 1
     })
 
       .then(student => {
         if (!student) {
           return res.status(404).json({
-            error: "Something went wrong, Try again!"
+            error: "Student not found!"
           });
         }
         res.json(student);
@@ -139,10 +131,11 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes
+      classes,
+      DOB,
+      dateOfAdmission
     } = req.body;
-    const DOB = new Date(req.body.DOB);
-    const dateOfAdmission = new Date(req.body.dateOfAdmission);
+
     const studentFields = {
       name,
       fatherName,
@@ -177,7 +170,7 @@ export class studentController {
   };
 
   //Validate Add Student Inputs
-  validateAddStudentInput = (data: studentData): any => {
+  validateAddStudentInput = (data: IStudent): any => {
     let errors = {
       name: "",
       fatherName: "",

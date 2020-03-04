@@ -1,18 +1,12 @@
 import React, { useState, useReducer, useContext } from "react";
 import axios from "axios";
 
-import { History, LocationState } from "history";
-
 import { authenticate, isAuth } from "../../utils/common/helpers";
 import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
-import { Redirect } from "react-router-dom";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 
-interface LoginComponentProps {
-  history: History<LocationState>;
-}
-
-const Login = (props: LoginComponentProps) => {
+const Login = ({ history }: RouteComponentProps) => {
   const [values, setValues] = useState({
     email: "test@test.com",
     password: "123456"
@@ -37,7 +31,7 @@ const Login = (props: LoginComponentProps) => {
         state.isAuthenticated = true;
         state.user = res.data.user;
         authenticate(res, () => {
-          isAuth() ? props.history.push("/dashboard") : props.history.push("/");
+          isAuth() ? history.push("/dashboard") : history.push("/");
         });
         //history.push('/landing')
       })

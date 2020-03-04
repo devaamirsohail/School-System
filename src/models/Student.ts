@@ -1,12 +1,17 @@
 import { Schema, Document, model } from "mongoose";
 
 export interface IStudent extends Document {
-  fname: string;
-  lname: string;
-  email: string;
-  password: string;
-  role: string;
-  resetPasswordLink: string;
+  name: string;
+  fatherName: string;
+  DOB: string;
+  dateOfAdmission: string;
+  placeOfBirth: string;
+  sex: string;
+  nationality: string;
+  address: string;
+  telephone: string;
+  mobile: string;
+  classes: string;
   timestamps: Date;
 }
 
@@ -22,11 +27,11 @@ const StudentSchema: Schema = new Schema(
       required: true
     },
     DOB: {
-      type: Date,
+      type: String,
       required: true
     },
     dateOfAdmission: {
-      type: Date,
+      type: String,
       required: true
     },
     placeOfBirth: {

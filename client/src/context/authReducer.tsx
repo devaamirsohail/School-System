@@ -11,7 +11,20 @@ export const initialState = {
       mobile: "",
       classes: ""
     }
-  ]
+  ],
+  student: {
+    name: "",
+    fatherName: "",
+    DOB: "",
+    dateOfAdmission: "",
+    placeOfBirth: "",
+    sex: "",
+    nationality: "",
+    address: "",
+    telephone: "",
+    mobile: "",
+    classes: ""
+  }
 };
 
 export const authReducer = (state: any) => {

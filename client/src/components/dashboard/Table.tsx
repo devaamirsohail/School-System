@@ -1,20 +1,23 @@
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
+import { Alert } from "reactstrap";
 //Helpers
 import { getCookie } from "../../utils/common/helpers";
-
-import DataTable, { createTheme } from "react-data-table-component";
+import { Link, withRouter, RouteComponentProps } from "react-router-dom";
 
 import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
 import Spinner from "../common/Spinner";
 
-import "./dashboard.scss";
-
-const Table = () => {
+const Table = ({ history }: RouteComponentProps) => {
   const context = useContext(authContext);
   const [state] = useReducer(authReducer, context);
   const [loading, setLoading] = useState(false);
+  const [allStudents, setAllStudents] = useState(context.students);
+  const { students } = context;
+  const [visible, setVisible] = useState(false);
+
+  const onDismiss = () => setVisible(false);
   const token = getCookie("token");
   useEffect(() => {
     setLoading(true);
@@ -27,78 +30,35 @@ const Table = () => {
     })
       .then(res => {
         state.students = res.data;
+        setAllStudents(res.data);
         setLoading(false);
       })
       .catch(err => {
         console.log(err);
       });
   }, []);
-  const { students } = context;
-  students.forEach(student => {
-    let dateOfBirth = new Date(student.DOB);
-    student.DOB =
-      dateOfBirth.getDate() +
-      "-" +
-      (dateOfBirth.getMonth() + 1) +
-      "-" +
-      dateOfBirth.getFullYear();
-  });
-  createTheme("solarized", {
-    text: {
-      size: "50px"
-    },
-    headCells: {
-      style: {
-        paddingLeft: "25px", // override the cell padding for head cells
-        paddingRight: "25px",
-        fontSize: "20px"
+
+  const handleEdit = (id: string) => {
+    history.push(`/student/${id}`);
+  };
+  const handleDelete = (id: string) => {
+    axios({
+      method: "DELETE",
+      url: `${process.env.REACT_APP_API}/api/student?id=${id}`,
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    },
-    context: {
-      background: "#cb4b16",
-      text: "#FFFFFF"
-    },
-    divider: {
-      default: "#073642"
-    },
-    action: {
-      button: "rgba(0,0,0,.54)",
-      hover: "rgba(0,0,0,.08)",
-      disabled: "rgba(0,0,0,.12)"
-    }
-  });
-  const columns = [
-    {
-      name: "Name",
-      selector: "name",
-      sortable: true
-    },
-    {
-      name: "Father Name",
-      selector: "fatherName",
-      sortable: true
-    },
-    {
-      name: "Date of Birth	",
-      selector: "DOB",
-      sortable: true
-    },
-    {
-      name: "Gender",
-      selector: "sex",
-      sortable: true
-    },
-    {
-      name: "Mobile",
-      selector: "mobile",
-      sortable: true
-    },
-    {
-      name: "Class",
-      selector: "classes",
-      sortable: true
-    }
-  ];
+    })
+      .then(res => {
+        state.students = students.filter((student: any) => student._id !== id);
+        setAllStudents(state.students);
+        setVisible(true);
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   const studentTable = () => (
     <section className="content">
@@ -107,15 +67,81 @@ const Table = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-body table-responsive p-0">
-                <DataTable
-                  title="Students"
-                  columns={columns}
-                  data={students}
-                  theme="solarized"
-                  pagination
-                  striped
-                  persistTableHead
-                />
+                <div className="row">
+                  <div className="col-12">
+                    <div className="card">
+                      <div className="card-header">
+                        <h3 className="card-title">All Students</h3>
+                        <div className="card-tools">
+                          <div
+                            className="input-group input-group-sm"
+                            style={{ width: 150 }}
+                          >
+                            <Link
+                              to="/addstudent"
+                              type="button"
+                              className="btn btn-block btn-primary"
+                            >
+                              Add New Student
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                      {/* /.card-header */}
+                      <div className="card-body table-responsive p-0">
+                        <table className="table table-hover text-nowrap table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Index</th>
+                              <th>Name</th>
+                              {/* <th>Father Name</th> */}
+                              <th>Date of Birth</th>
+                              <th>Gender</th>
+                              <th>Mobile</th>
+                              <th>Class</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {allStudents.map((student: any, index) => {
+                              return (
+                                <tr key={index}>
+                                  <td>{index + 1}</td>
+                                  <td>{student.name}</td>
+                                  {/* <td>{student.fatherName}</td> */}
+                                  <td>{student.DOB}</td>
+                                  <td>{student.sex}</td>
+                                  <td>{student.mobile}</td>
+                                  <td>{student.classes}</td>
+                                  <td>
+                                    <i
+                                      onClick={() => handleEdit(student._id)}
+                                      className="far fa-edit pr-2"
+                                      style={{
+                                        color: "#28a745",
+                                        cursor: "pointer"
+                                      }}
+                                    ></i>
+                                    <i
+                                      onClick={() => handleDelete(student._id)}
+                                      className="far fa-trash-alt"
+                                      style={{
+                                        color: "#dc3545",
+                                        cursor: "pointer"
+                                      }}
+                                    ></i>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* /.card-body */}
+                    </div>
+                    {/* /.card */}
+                  </div>
+                </div>
               </div>
               {/* /.card-body */}
             </div>
@@ -147,7 +173,10 @@ const Table = () => {
             </div>
             {/* /.col */}
           </div>
-          {/* /.row */}
+          <Alert color="success" isOpen={visible} toggle={onDismiss}>
+            <h4 className="alert-heading">Success</h4>
+            <p>You have successfully deleted the student</p>
+          </Alert>
         </div>
         {/* /.container-fluid */}
       </div>
@@ -155,4 +184,4 @@ const Table = () => {
     </div>
   );
 };
-export default Table;
+export default withRouter(Table);

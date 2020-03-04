@@ -11,13 +11,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import User from "../models/User";
 
-interface userData {
-  fname: string;
-  lname: string;
-  email: string;
-  password: string;
-  role: string;
-}
+import { IUser } from "../models/User";
 
 export class authController {
   //Register Controller
@@ -118,7 +112,7 @@ export class authController {
   };
 
   //Validate Register Inputs
-  validateRegisterInput = (data: userData): any => {
+  validateRegisterInput = (data: IUser): any => {
     let errors = {
       fname: "",
       lname: "",
@@ -166,7 +160,7 @@ export class authController {
     };
   };
   //Validate Login Inputs
-  validateLoginInput = (data: userData): any => {
+  validateLoginInput = (data: IUser): any => {
     let errors = {
       email: "",
       password: ""

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import axios from "axios";
 
 import NumberFormat from "react-number-format";
@@ -10,14 +10,14 @@ import SideBar from "../common/SideBar";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 
-const AddStudent = () => {
+const StudentForm = ({ history }: RouteComponentProps) => {
   const [studentData, setStudentData] = useState({
     name: "",
     fatherName: "",
     DOB: "",
     dateOfAdmission: "",
     placeOfBirth: "",
-    sex: "male",
+    sex: "Male",
     nationality: "",
     address: "",
     telephone: "",
@@ -57,6 +57,7 @@ const AddStudent = () => {
     })
       .then(res => {
         console.log(res);
+        history.push("/students");
       })
       .catch(err => {
         console.log(err);
@@ -163,9 +164,11 @@ const AddStudent = () => {
                           <input
                             type="radio"
                             name="sex"
-                            defaultChecked
+                            defaultChecked={
+                              sex.toLowerCase() === "male" ? true : false
+                            }
                             id="radioSuccess1"
-                            value="male"
+                            value="Male"
                             onClick={handleChange("sex")}
                           />
                           <label htmlFor="radioSuccess1">Male</label>
@@ -174,7 +177,10 @@ const AddStudent = () => {
                           <input
                             type="radio"
                             name="sex"
-                            value="female"
+                            defaultChecked={
+                              sex.toLowerCase() === "female" ? true : false
+                            }
+                            value="Female"
                             id="radioSuccess3"
                             onClick={handleChange("sex")}
                           />
@@ -301,4 +307,4 @@ const AddStudent = () => {
     </React.Fragment>
   );
 };
-export default AddStudent;
+export default StudentForm;

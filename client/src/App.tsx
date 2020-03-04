@@ -7,7 +7,8 @@ import PrivateRoute from "./components/common/PrivateRoute";
 //import component
 import Login from "./components/auth/Login";
 import Main from "./components/dashboard/Main";
-import AddStudent from "./components/dashboard/AddStudent";
+import StudentForm from "./components/dashboard/StudentForm";
+import EditStudent from "./components/dashboard/EditStudent";
 import Student from "./components/dashboard/Student";
 
 const App: React.FC = () => {
@@ -16,8 +17,9 @@ const App: React.FC = () => {
       <Switch>
         <Route exact path="/" component={Login} />
         <PrivateRoute exact path="/dashboard" component={Main} />
-        <PrivateRoute exact path="/addstudent" component={AddStudent} />
+        <PrivateRoute exact path="/addstudent" component={StudentForm} />
         <PrivateRoute exact path="/students" component={Student} />
+        <PrivateRoute exact path="/student/:id" component={EditStudent} />
       </Switch>
     </Router>
   );
