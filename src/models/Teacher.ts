@@ -1,22 +1,22 @@
 import { Schema, Document, model } from "mongoose";
 
-export interface IStudent extends Document {
+export interface ITeacher extends Document {
   name: string;
   fatherName: string;
   DOB: string;
-  dateOfAdmission: string;
+  dateOfJoining: string;
   placeOfBirth: string;
   sex: string;
   nationality: string;
   address: string;
   telephone: string;
   mobile: string;
-  classes: string;
+  subject: string;
   timestamps: Date;
 }
 
-//Student Schema
-const StudentSchema: Schema = new Schema(
+//Teacher Schema
+const TeacherSchema: Schema = new Schema(
   {
     name: {
       type: String,
@@ -30,7 +30,7 @@ const StudentSchema: Schema = new Schema(
       type: String,
       required: true
     },
-    dateOfAdmission: {
+    dateOfJoining: {
       type: String,
       required: true
     },
@@ -58,11 +58,11 @@ const StudentSchema: Schema = new Schema(
       type: String,
       required: true
     },
-    classes: {
+    subject: {
       type: String,
       required: true
     }
   },
   { timestamps: true }
 );
-export default model<IStudent & Document>("Student", StudentSchema);
+export default model<ITeacher & Document>("Teacher", TeacherSchema);

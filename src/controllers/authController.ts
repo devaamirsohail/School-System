@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcryptjs";
 import Validator from "validator";
+import * as expressJwt from "express-jwt";
 
 import { JWT_SECRET } from "../config/constants";
 
@@ -185,4 +186,9 @@ export class authController {
       isValid: isEmpty(errors)
     };
   };
+  //Authenticate user with token
+  requireSignin = expressJwt({
+    credentialsRequired: true,
+    secret: JWT_SECRET //req.user
+  });
 }

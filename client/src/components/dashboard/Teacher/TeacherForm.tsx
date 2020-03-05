@@ -4,60 +4,60 @@ import axios from "axios";
 
 import NumberFormat from "react-number-format";
 //Helpers
-import { getCookie } from "../../utils/common/helpers";
+import { getCookie } from "../../../utils/common/helpers";
 
-import SideBar from "../common/SideBar";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
+import SideBar from "../../common/SideBar";
+import Header from "../../common/Header";
+import Footer from "../../common/Footer";
 
-const StudentForm = ({ history }: RouteComponentProps) => {
-  const [studentData, setStudentData] = useState({
+const TeacherForm = ({ history }: RouteComponentProps) => {
+  const [teacherData, setTeacherData] = useState({
     name: "",
     fatherName: "",
     DOB: "",
-    dateOfAdmission: "",
+    dateOfJoining: "",
     placeOfBirth: "",
     sex: "Male",
     nationality: "",
     address: "",
     telephone: "",
     mobile: "",
-    classes: "1st Class"
+    subject: "1st Class"
   });
 
   const {
     name,
     fatherName,
     DOB,
-    dateOfAdmission,
+    dateOfJoining,
     placeOfBirth,
     sex,
     nationality,
     address,
     telephone,
     mobile,
-    classes
-  } = studentData;
+    subject
+  } = teacherData;
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setStudentData({ ...studentData, [name]: event.currentTarget.value });
+    setTeacherData({ ...teacherData, [name]: event.currentTarget.value });
   };
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const token = getCookie("token");
     axios({
       method: "POST",
-      url: `${process.env.REACT_APP_API}/api/student/add`,
+      url: `${process.env.REACT_APP_API}/api/teacher/add`,
       headers: {
         Authorization: `Bearer ${token}`
       },
-      data: studentData
+      data: teacherData
     })
       .then(res => {
         console.log(res);
-        history.push("/students");
+        history.push("/teachers");
       })
       .catch(err => {
         console.log(err);
@@ -73,14 +73,14 @@ const StudentForm = ({ history }: RouteComponentProps) => {
           <div className="container-fluid">
             <div className="row mb-2">
               <div className="col-sm-6">
-                <h1>Add Student</h1>
+                <h1>Add Teacher</h1>
               </div>
               <div className="col-sm-6">
                 <ol className="breadcrumb float-sm-right">
                   <li className="breadcrumb-item">
                     <Link to="/dashboard">Dashboard</Link>
                   </li>
-                  <li className="breadcrumb-item active">Add Student</li>
+                  <li className="breadcrumb-item active">Add Teacher</li>
                 </ol>
               </div>
             </div>
@@ -93,7 +93,7 @@ const StudentForm = ({ history }: RouteComponentProps) => {
             {/* general form elements */}
             <div className="card card-primary">
               <div className="card-header">
-                <h3 className="card-title">Student Form</h3>
+                <h3 className="card-title">Teacher Form</h3>
               </div>
               {/* /.card-header */}
               {/* form start */}
@@ -211,7 +211,7 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                     </div>
 
                     <div className="form-group col-md-4">
-                      <label>Date of Admission</label>
+                      <label>Date of Joining:</label>
                       <div className="input-group">
                         <div className="input-group-prepend">
                           <span className="input-group-text">
@@ -223,8 +223,8 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                           format="##-##-####"
                           placeholder="DD-MM-YYYY"
                           mask={["D", "D", "M", "M", "Y", "Y", "Y", "Y"]}
-                          value={dateOfAdmission}
-                          onChange={handleChange("dateOfAdmission")}
+                          value={dateOfJoining}
+                          onChange={handleChange("dateOfJoining")}
                         />
                       </div>
                     </div>
@@ -266,22 +266,22 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                       </div>
                     </div>
                     <div className="form-group col-md-4">
-                      <label>Class</label>
+                      <label>Subject:</label>
                       <select
-                        onChange={handleChange("classes")}
+                        onChange={handleChange("subject")}
                         className="form-control "
-                        value={classes}
+                        value={subject}
                       >
-                        <option value="1st Class">1st Class</option>
-                        <option value="2nd Class">2nd Class</option>
-                        <option value="3th Class">3th Class</option>
-                        <option value="4th Class">4th Class</option>
-                        <option value="5th Class">5th Class</option>
-                        <option value="6th Class">6th Class</option>
-                        <option value="7th Class">7th Class</option>
-                        <option value="8th Class">8th Class</option>
-                        <option value="9th Class">9th Class</option>
-                        <option value="10th Class">10th Class</option>
+                        <option value="1st Class">Physcics</option>
+                        <option value="2nd Class">Chemistry</option>
+                        <option value="3th Class">Mathematics</option>
+                        <option value="4th Class">English</option>
+                        <option value="5th Class">Chemistry</option>
+                        <option value="6th Class">Biology</option>
+                        <option value="7th Class">Computer Science</option>
+                        <option value="8th Class">Urdu</option>
+                        <option value="9th Class">Social Studies</option>
+                        <option value="10th Class">Islamiyat</option>
                       </select>
                     </div>
                   </div>
@@ -307,4 +307,4 @@ const StudentForm = ({ history }: RouteComponentProps) => {
     </React.Fragment>
   );
 };
-export default StudentForm;
+export default TeacherForm;

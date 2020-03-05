@@ -1,38 +1,37 @@
 import { Router } from "express";
 
 //import controller
-import { studentController } from "../controllers/studentController";
 import { authController } from "../controllers/authController";
+import { teacherController } from "../controllers/teacherController";
 
-export class studentRoute {
-  student = new studentController();
+export class teacherRoute {
+  teacher = new teacherController();
   auth = new authController();
-
   public routes(router: Router): Router {
     router.post(
-      "/api/student/add",
+      "/api/teacher/add",
       this.auth.requireSignin,
-      this.student.AddStudent
+      this.teacher.AddTeacher
     );
     router.get(
-      "/api/student/all",
+      "/api/teacher/all",
       this.auth.requireSignin,
-      this.student.GetAllStudents
+      this.teacher.GetAllTeachers
     );
     router.get(
-      "/api/student",
+      "/api/teacher",
       this.auth.requireSignin,
-      this.student.GetStudent
+      this.teacher.GetTeacher
     );
     router.delete(
-      "/api/student",
+      "/api/teacher",
       this.auth.requireSignin,
-      this.student.DeleteStudent
+      this.teacher.DeleteTeacher
     );
     router.put(
-      "/api/student",
+      "/api/teacher",
       this.auth.requireSignin,
-      this.student.UpdateStudent
+      this.teacher.UpdateTeacher
     );
 
     return router;

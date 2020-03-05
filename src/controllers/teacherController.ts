@@ -1,18 +1,21 @@
 import { Request, Response } from "express";
 import Validator from "validator";
+import * as expressJwt from "express-jwt";
+
+import { JWT_SECRET } from "../config/constants";
 
 //import validator
 import isEmpty from "../validator/is-empty";
 
 //import user model
-import Student from "../models/Student";
+import Teacher from "../models/Teacher";
 
-import { IStudent } from "../models/Student";
+import { ITeacher } from "../models/Teacher";
 
-export class studentController {
-  //Add Student Controller
-  AddStudent = (req: Request, res: Response) => {
-    const { errors, isValid } = this.validateAddStudentInput(req.body);
+export class teacherController {
+  //Add Teacher Controller
+  AddTeacher = (req: Request, res: Response) => {
+    const { errors, isValid } = this.validateAddTeacherInput(req.body);
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -28,90 +31,90 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes,
+      subject,
       DOB,
-      dateOfAdmission
+      dateOfJoining
     } = req.body;
-    const newStudent = new Student({
+    const newTeacher = new Teacher({
       name,
       fatherName,
       DOB,
-      dateOfAdmission,
+      dateOfJoining,
       placeOfBirth,
       sex,
       nationality,
       address,
       telephone,
       mobile,
-      classes
+      subject
     });
 
-    newStudent
+    newTeacher
       .save()
       .then(user => res.json(user))
       .catch(err => {
         console.log(err);
         res.json({
-          error: "Error in saving student to database, try again."
+          error: "Error in saving teacher to database, try again."
         });
       });
   };
 
-  //Get All Student Controller
-  GetAllStudents = (req: Request, res: Response) => {
-    Student.find(
+  //Get All Teacher Controller
+  GetAllTeachers = (req: Request, res: Response) => {
+    Teacher.find(
       {},
       {
         name: 1,
         fatherName: 1,
-        DOB: 1,
+        dateOfJoining: 1,
         sex: 1,
         address: 1,
         mobile: 1,
-        classes: 1
+        subject: 1
       }
     )
 
-      .then(students => {
-        if (!students) {
+      .then(Teachers => {
+        if (!Teachers) {
           return res.status(404).json({
-            error: "There are no students"
+            error: "There are no Teachers"
           });
         }
-        res.json(students);
+        res.json(Teachers);
       })
       .catch(err => res.status(404).json(err));
   };
-  //Get Single Student Controller
-  GetStudent = (req: Request, res: Response) => {
-    Student.findById(req.query.id, {
+  //Get Single Teacher Controller
+  GetTeacher = (req: Request, res: Response) => {
+    Teacher.findById(req.query.id, {
       name: 1,
       fatherName: 1,
       DOB: 1,
       sex: 1,
       address: 1,
       mobile: 1,
-      classes: 1,
+      subject: 1,
       telephone: 1,
       nationality: 1,
-      dateOfAdmission: 1,
+      dateOfJoining: 1,
       placeOfBirth: 1
     })
 
-      .then(student => {
-        if (!student) {
+      .then(teacher => {
+        if (!teacher) {
           return res.status(404).json({
-            error: "Student not found!"
+            error: "Teacher not found!"
           });
         }
-        res.json(student);
+        res.json(teacher);
       })
       .catch(err => res.status(404).json(err));
   };
 
-  //Update Student Controller
-  UpdateStudent = (req: Request, res: Response) => {
-    const { errors, isValid } = this.validateAddStudentInput(req.body);
+  //Update Teacher Controller
+  UpdateTeacher = (req: Request, res: Response) => {
+    const { errors, isValid } = this.validateAddTeacherInput(req.body);
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -127,72 +130,70 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes,
+      subject,
       DOB,
-      dateOfAdmission
+      dateOfJoining
     } = req.body;
 
-    const studentFields = {
+    const teacherFields = {
       name,
       fatherName,
       DOB,
-      dateOfAdmission,
+      dateOfJoining,
       placeOfBirth,
       sex,
       nationality,
       address,
       telephone,
       mobile,
-      classes
+      subject
     };
 
-    Student.findByIdAndUpdate(
+    Teacher.findByIdAndUpdate(
       req.query.id,
-      { $set: studentFields },
+      { $set: teacherFields },
       { new: true }
     )
-      .then(student => {
-        res.json(student);
+      .then(teacher => {
+        res.json(teacher);
       })
       .catch(err => res.status(404).json(err));
   };
-  //Delete Student Controller
-  DeleteStudent = (req: Request, res: Response) => {
-    Student.findByIdAndDelete(req.query.id)
+  //Delete Teacher Controller
+  DeleteTeacher = (req: Request, res: Response) => {
+    Teacher.findByIdAndDelete(req.query.id)
       .then(() => {
         res.json({ success: true });
       })
       .catch(err => res.status(404).json(err));
   };
 
-  //Validate Add Student Inputs
-  validateAddStudentInput = (data: IStudent): any => {
+  //Validate Add Teacher Inputs
+  validateAddTeacherInput = (data: ITeacher): any => {
     let errors = {
       name: "",
       fatherName: "",
       DOB: "",
-      dateOfAdmission: "",
+      dateOfJoining: "",
       placeOfBirth: "",
       sex: "",
       nationality: "",
       address: "",
       telephone: "",
       mobile: "",
-      classes: ""
+      subject: ""
     };
     data.name = !isEmpty(data.name) ? data.name : "";
     data.fatherName = !isEmpty(data.fatherName) ? data.fatherName : "";
     data.DOB = !isEmpty(data.DOB) ? data.DOB : "";
-    data.dateOfAdmission = !isEmpty(data.dateOfAdmission)
-      ? data.dateOfAdmission
-      : "";
+    data.dateOfJoining = !isEmpty(data.dateOfJoining) ? data.dateOfJoining : "";
     data.placeOfBirth = !isEmpty(data.placeOfBirth) ? data.placeOfBirth : "";
     data.sex = !isEmpty(data.sex) ? data.sex : "";
     data.nationality = !isEmpty(data.nationality) ? data.nationality : "";
     data.address = !isEmpty(data.address) ? data.address : "";
     data.telephone = !isEmpty(data.telephone) ? data.telephone : "";
     data.mobile = !isEmpty(data.mobile) ? data.mobile : "";
-    data.classes = !isEmpty(data.classes) ? data.classes : "";
+    data.subject = !isEmpty(data.subject) ? data.subject : "";
 
     if (Validator.isEmpty(data.name)) {
       errors.name = "Name is required";
@@ -206,8 +207,8 @@ export class studentController {
       errors.DOB = "Date of Birth is required";
     }
 
-    if (Validator.isEmpty(data.dateOfAdmission)) {
-      errors.dateOfAdmission = "Date of Admission is required";
+    if (Validator.isEmpty(data.dateOfJoining)) {
+      errors.dateOfJoining = "Date of Joining is required";
     }
 
     if (Validator.isEmpty(data.placeOfBirth)) {
@@ -229,8 +230,8 @@ export class studentController {
     if (Validator.isEmpty(data.mobile)) {
       errors.mobile = "Mobile field is required";
     }
-    if (Validator.isEmpty(data.classes)) {
-      errors.classes = "Class field is required";
+    if (Validator.isEmpty(data.subject)) {
+      errors.subject = "Subject field is required";
     }
 
     return {

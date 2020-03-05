@@ -21,6 +21,11 @@ const Header = () => {
             Students
           </Link>
         </li>
+        <li className="nav-item d-none d-sm-inline-block">
+          <Link to="/teachers" className="nav-link">
+            Teachers
+          </Link>
+        </li>
       </ul>
       {/* Right navbar links */}
       <ul className="navbar-nav ml-auto">

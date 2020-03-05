@@ -2,12 +2,12 @@ import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
 //Helpers
-import { getCookie } from "../../utils/common/helpers";
+import { getCookie } from "../../../utils/common/helpers";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
 
-import { authReducer } from "../../context/authReducer";
-import authContext from "../../context/authContext";
-import Spinner from "../common/Spinner";
+import { authReducer } from "../../../context/authReducer";
+import authContext from "../../../context/authContext";
+import Spinner from "../../common/Spinner";
 
 const Table = ({ history }: RouteComponentProps) => {
   const context = useContext(authContext);
@@ -34,6 +34,7 @@ const Table = ({ history }: RouteComponentProps) => {
         setLoading(false);
       })
       .catch(err => {
+        setLoading(false);
         console.log(err);
       });
   }, []);

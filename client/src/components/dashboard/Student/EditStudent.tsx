@@ -4,15 +4,15 @@ import axios from "axios";
 
 import NumberFormat from "react-number-format";
 //Helpers
-import { getCookie } from "../../utils/common/helpers";
+import { getCookie } from "../../../utils/common/helpers";
 
-import { authReducer } from "../../context/authReducer";
-import authContext from "../../context/authContext";
+import { authReducer } from "../../../context/authReducer";
+import authContext from "../../../context/authContext";
 
-import SideBar from "../common/SideBar";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
-import Spinner from "../common/Spinner";
+import SideBar from "../../common/SideBar";
+import Header from "../../common/Header";
+import Footer from "../../common/Footer";
+import Spinner from "../../common/Spinner";
 
 type TParams = { id: string };
 const EditStudent = ({ history, match }: RouteComponentProps<TParams>) => {
