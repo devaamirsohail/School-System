@@ -12,7 +12,6 @@ export interface IStudent extends Document {
   telephone: string;
   mobile: string;
   classes: string;
-  timestamps: Date;
 }
 
 //Student Schema

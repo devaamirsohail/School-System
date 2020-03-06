@@ -1,3 +1,5 @@
+import { SET_CURRENT_USER, STUDENTS } from "./types";
+
 export const initialState = {
   isAuthenticated: false,
   user: null,
@@ -48,9 +50,33 @@ export const initialState = {
     telephone: "",
     mobile: "",
     subject: ""
-  }
+  },
+  subjects: [
+    {
+      title: ""
+    }
+  ]
 };
 
-export const authReducer = (state: any) => {
-  return state;
+export const authReducer = (state: any, action: any) => {
+  switch (action.type) {
+    case SET_CURRENT_USER:
+      console.log("SET_CURRENT_USER", action);
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload,
+        loading: false
+      };
+    case STUDENTS:
+      console.log("STUDENTS", action);
+      return {
+        ...state,
+        student: action.payload,
+        loading: false
+      };
+    default:
+      console.log("default");
+      return state;
+  }
 };

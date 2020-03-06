@@ -19,6 +19,8 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
   const context = useContext(authContext);
   const [state] = useReducer(authReducer, context);
   const [loading, setLoading] = useState(false);
+  const { subjects } = context;
+  const [allSubjects, setAllSubjects] = useState(subjects);
 
   const token = getCookie("token");
   const { teacher } = context;
@@ -48,6 +50,24 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
       .then(res => {
         state.teacher = res.data;
         setTeacherData(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log(err);
+      });
+  }, []);
+  useEffect(() => {
+    axios({
+      method: "GET",
+      url: `${process.env.REACT_APP_API}/api/subject/all`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        state.subjects = res.data;
+        setAllSubjects(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -293,23 +313,17 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
                     </div>
                   </div>
                   <div className="form-group col-md-4">
-                    <label>Class</label>
                     <label>Subject:</label>
                     <select
                       onChange={handleChange("subject")}
                       className="form-control "
                       value={subject}
                     >
-                      <option value="1st Class">Physcics</option>
-                      <option value="2nd Class">Chemistry</option>
-                      <option value="3th Class">Mathematics</option>
-                      <option value="4th Class">English</option>
-                      <option value="5th Class">Chemistry</option>
-                      <option value="6th Class">Biology</option>
-                      <option value="7th Class">Computer Science</option>
-                      <option value="8th Class">Urdu</option>
-                      <option value="9th Class">Social Studies</option>
-                      <option value="10th Class">Islamiyat</option>
+                      {subjects.map((val: any, index) => (
+                        <option key={index} value={val.title}>
+                          {val.title}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>

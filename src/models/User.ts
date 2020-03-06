@@ -7,7 +7,6 @@ export interface IUser extends Document {
   password: string;
   role: string;
   resetPasswordLink: string;
-  timestamps: Date;
 }
 
 //User Schema

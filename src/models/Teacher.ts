@@ -12,7 +12,6 @@ export interface ITeacher extends Document {
   telephone: string;
   mobile: string;
   subject: string;
-  timestamps: Date;
 }
 
 //Teacher Schema

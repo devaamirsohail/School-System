@@ -13,6 +13,7 @@ import Student from "./components/dashboard/Student/Student";
 import TeacherForm from "./components/dashboard/Teacher/TeacherForm";
 import EditTeacher from "./components/dashboard/Teacher/EditTeacher";
 import Teacher from "./components/dashboard/Teacher/Teacher";
+import Subject from "./components/dashboard/Subject";
 
 const App: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const App: React.FC = () => {
         <PrivateRoute exact path="/addteacher" component={TeacherForm} />
         <PrivateRoute exact path="/teachers" component={Teacher} />
         <PrivateRoute exact path="/teacher/:id" component={EditTeacher} />
+        <PrivateRoute exact path="/subjects" component={Subject} />
       </Switch>
     </Router>
   );

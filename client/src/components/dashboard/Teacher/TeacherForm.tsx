@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import axios from "axios";
 
@@ -6,11 +6,19 @@ import NumberFormat from "react-number-format";
 //Helpers
 import { getCookie } from "../../../utils/common/helpers";
 
+import { authReducer } from "../../../context/authReducer";
+import authContext from "../../../context/authContext";
+
 import SideBar from "../../common/SideBar";
 import Header from "../../common/Header";
 import Footer from "../../common/Footer";
 
 const TeacherForm = ({ history }: RouteComponentProps) => {
+  const context = useContext(authContext);
+  const [state] = useReducer(authReducer, context);
+  const [loading, setLoading] = useState(false);
+  const { subjects } = context;
+  const [allSubjects, setAllSubjects] = useState(subjects);
   const [teacherData, setTeacherData] = useState({
     name: "",
     fatherName: "",
@@ -22,7 +30,7 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
     address: "",
     telephone: "",
     mobile: "",
-    subject: "1st Class"
+    subject: ""
   });
 
   const {
@@ -38,7 +46,26 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
     mobile,
     subject
   } = teacherData;
+  const token = getCookie("token");
 
+  useEffect(() => {
+    axios({
+      method: "GET",
+      url: `${process.env.REACT_APP_API}/api/subject/all`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        state.subjects = res.data;
+        setAllSubjects(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log(err);
+      });
+  }, []);
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -46,7 +73,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
   };
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const token = getCookie("token");
     axios({
       method: "POST",
       url: `${process.env.REACT_APP_API}/api/teacher/add`,
@@ -272,16 +298,11 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                         className="form-control "
                         value={subject}
                       >
-                        <option value="1st Class">Physcics</option>
-                        <option value="2nd Class">Chemistry</option>
-                        <option value="3th Class">Mathematics</option>
-                        <option value="4th Class">English</option>
-                        <option value="5th Class">Chemistry</option>
-                        <option value="6th Class">Biology</option>
-                        <option value="7th Class">Computer Science</option>
-                        <option value="8th Class">Urdu</option>
-                        <option value="9th Class">Social Studies</option>
-                        <option value="10th Class">Islamiyat</option>
+                        {subjects.map((val: any, index) => (
+                          <option key={index} value={val.title}>
+                            {val.title}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
