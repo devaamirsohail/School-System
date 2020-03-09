@@ -1,18 +1,6 @@
 import { Schema, Document, model } from "mongoose";
 
-export interface ITeacher extends Document {
-  name: string;
-  fatherName: string;
-  DOB: string;
-  dateOfJoining: string;
-  placeOfBirth: string;
-  sex: string;
-  nationality: string;
-  address: string;
-  telephone: string;
-  mobile: string;
-  subject: string;
-}
+import { ITeacher } from "../Interfaces/teacher.interface";
 
 //Teacher Schema
 const TeacherSchema: Schema = new Schema(

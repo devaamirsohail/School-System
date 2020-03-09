@@ -7,7 +7,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import Subject from "../models/Subject";
 
-import { ISubject } from "../models/Subject";
+import { ISubject } from "../Interfaces/subject.interface";
 
 export class subjectController {
   //Add Subject Controller

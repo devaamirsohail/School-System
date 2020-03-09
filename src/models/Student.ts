@@ -1,18 +1,6 @@
 import { Schema, Document, model } from "mongoose";
 
-export interface IStudent extends Document {
-  name: string;
-  fatherName: string;
-  DOB: string;
-  dateOfAdmission: string;
-  placeOfBirth: string;
-  sex: string;
-  nationality: string;
-  address: string;
-  telephone: string;
-  mobile: string;
-  classes: string;
-}
+import { IStudent } from "../Interfaces/student.interface";
 
 //Student Schema
 const StudentSchema: Schema = new Schema(

@@ -14,6 +14,8 @@ import TeacherForm from "./components/dashboard/Teacher/TeacherForm";
 import EditTeacher from "./components/dashboard/Teacher/EditTeacher";
 import Teacher from "./components/dashboard/Teacher/Teacher";
 import Subject from "./components/dashboard/Subject";
+import Classes from "./components/dashboard/Classes";
+import Section from "./components/dashboard/Section";
 
 const App: React.FC = () => {
   return (
@@ -28,6 +30,8 @@ const App: React.FC = () => {
         <PrivateRoute exact path="/teachers" component={Teacher} />
         <PrivateRoute exact path="/teacher/:id" component={EditTeacher} />
         <PrivateRoute exact path="/subjects" component={Subject} />
+        <PrivateRoute exact path="/classes" component={Classes} />
+        <PrivateRoute exact path="/section" component={Section} />
       </Switch>
     </Router>
   );

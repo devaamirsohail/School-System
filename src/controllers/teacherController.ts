@@ -10,7 +10,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import Teacher from "../models/Teacher";
 
-import { ITeacher } from "../models/Teacher";
+import { ITeacher } from "../Interfaces/teacher.interface";
 
 export class teacherController {
   //Add Teacher Controller

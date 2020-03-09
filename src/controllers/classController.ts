@@ -7,11 +7,12 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import Classes from "../models/Classes";
 
-import { IClass } from "../models/Classes";
+import { IClass } from "../Interfaces/classes.interface";
 
 export class classController {
   //Add Class Controller
   AddClass = (req: Request, res: Response) => {
+    console.log(req.body);
     const { errors, isValid } = this.validateAddClassInput(req.body);
 
     //Check Validation
@@ -22,20 +23,10 @@ export class classController {
     //Register Controller
     const classFields = {
       title: req.body.title,
-      HOC: req.body.HOC,
-      section: [
-        {
-          name: req.body.name ? req.body.name : "",
-          subject:
-            typeof req.body.subject !== "undefined"
-              ? req.body.subject.split(",")
-              : [""]
-        }
-      ]
+      HOC: req.body.HOC
     };
 
     const newClasses = new Classes(classFields);
-    console.log(classFields.section);
     newClasses
       .save()
       .then(user => res.json(user))
@@ -96,37 +87,15 @@ export class classController {
       return res.status(400).json(errors);
     }
 
-    const {
-      name,
-      fatherName,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      classes,
-      DOB,
-      dateOfAdmission
-    } = req.body;
-
-    const classesFields = {
-      name,
-      fatherName,
-      DOB,
-      dateOfAdmission,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      classes
+    //Register Controller
+    let classFields: any = {
+      title: req.body.title,
+      HOC: req.body.HOC
     };
 
     Classes.findByIdAndUpdate(
       req.query.id,
-      { $set: classesFields },
+      { $set: classFields },
       { new: true }
     )
       .then(classes => {

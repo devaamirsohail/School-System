@@ -1,8 +1,5 @@
 import { Schema, Document, model } from "mongoose";
-
-export interface ISubject extends Document {
-  title: string;
-}
+import { ISubject } from "../Interfaces/subject.interface";
 
 //Subject Schema
 const SubjectSchema: Schema = new Schema(

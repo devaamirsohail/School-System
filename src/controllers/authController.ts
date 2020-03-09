@@ -12,7 +12,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import User from "../models/User";
 
-import { IUser } from "../models/User";
+import { IUser } from "../Interfaces/user.interface";
 
 export class authController {
   //Register Controller

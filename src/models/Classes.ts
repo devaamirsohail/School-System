@@ -1,10 +1,6 @@
 import { Schema, Document, model } from "mongoose";
 
-export interface IClass extends Document {
-  title: string;
-  HOC: string;
-  section: [{ name: string; subject: [{ title: string }] }];
-}
+import { IClass } from "../Interfaces/classes.interface";
 
 //Classes Schema
 const ClassSchema = new Schema(
@@ -17,18 +13,7 @@ const ClassSchema = new Schema(
     HOC: {
       type: Schema.Types.ObjectId,
       ref: "Teacher"
-    },
-
-    section: [
-      {
-        name: {
-          type: String
-        },
-        subject: {
-          type: [String]
-        }
-      }
-    ]
+    }
   },
   { timestamps: true }
 );

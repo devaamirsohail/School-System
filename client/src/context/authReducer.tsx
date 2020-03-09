@@ -55,6 +55,19 @@ export const initialState = {
     {
       title: ""
     }
+  ],
+  classes: [
+    {
+      title: "",
+      HOC: ""
+    }
+  ],
+  sections: [
+    {
+      title: "",
+      classes: "",
+      subjects: ""
+    }
   ]
 };
 

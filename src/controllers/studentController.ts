@@ -7,7 +7,7 @@ import isEmpty from "../validator/is-empty";
 //import user model
 import Student from "../models/Student";
 
-import { IStudent } from "../models/Student";
+import { IStudent } from "../Interfaces/student.interface";
 
 export class studentController {
   //Add Student Controller
