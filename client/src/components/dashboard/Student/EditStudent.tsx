@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import axios from "axios";
+import Select from "react-select";
 
 import NumberFormat from "react-number-format";
 //Helpers
@@ -19,8 +20,8 @@ const EditStudent = ({ history, match }: RouteComponentProps<TParams>) => {
   const context = useContext(authContext);
   const [state] = useReducer(authReducer, context);
   const [loading, setLoading] = useState(false);
+  const [allClasses, setAllClasses] = useState(context.classes);
 
-  const token = getCookie("token");
   const { student } = context;
   const [studentData, setStudentData] = useState({
     name: student.name,
@@ -35,9 +36,29 @@ const EditStudent = ({ history, match }: RouteComponentProps<TParams>) => {
     mobile: student.mobile,
     classes: student.classes
   });
+
+  const {
+    name,
+    fatherName,
+    DOB,
+    dateOfAdmission,
+    placeOfBirth,
+    sex,
+    nationality,
+    address,
+    telephone,
+    mobile,
+    classes
+  } = studentData;
   const id = match.params.id;
+  const token = getCookie("token");
   useEffect(() => {
     setLoading(true);
+    GetAllClasses();
+    GetStudentData();
+  }, []);
+  //Get Student Data
+  const GetStudentData = () => {
     axios({
       method: "GET",
       url: `${process.env.REACT_APP_API}/api/student?id=${id}`,
@@ -54,25 +75,39 @@ const EditStudent = ({ history, match }: RouteComponentProps<TParams>) => {
         setLoading(false);
         console.log(err);
       });
-  }, []);
-  const {
-    name,
-    fatherName,
-    DOB,
-    dateOfAdmission,
-    placeOfBirth,
-    sex,
-    nationality,
-    address,
-    telephone,
-    mobile,
-    classes
-  } = studentData;
-
+  };
+  //Get All Classes
+  const GetAllClasses = () => {
+    setLoading(true);
+    axios({
+      method: "GET",
+      url: `${process.env.REACT_APP_API}/api/class/all`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        state.classes = res.data;
+        setAllClasses(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log(err);
+      });
+  };
+  //Class dataset for select
+  const classOptions = allClasses.map((val: any) => ({
+    value: val.title,
+    label: val.title
+  }));
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setStudentData({ ...studentData, [name]: event.currentTarget.value });
+  };
+  const handleChangeSelect = (name: string) => (event: any) => {
+    setStudentData({ ...studentData, [name]: event.value });
   };
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -294,22 +329,15 @@ const EditStudent = ({ history, match }: RouteComponentProps<TParams>) => {
                   </div>
                   <div className="form-group col-md-4">
                     <label>Class</label>
-                    <select
-                      onChange={handleChange("classes")}
-                      className="form-control "
-                      value={classes}
-                    >
-                      <option value="1st Class">1st Class</option>
-                      <option value="2nd Class">2nd Class</option>
-                      <option value="3th Class">3th Class</option>
-                      <option value="4th Class">4th Class</option>
-                      <option value="5th Class">5th Class</option>
-                      <option value="6th Class">6th Class</option>
-                      <option value="7th Class">7th Class</option>
-                      <option value="8th Class">8th Class</option>
-                      <option value="9th Class">9th Class</option>
-                      <option value="10th Class">10th Class</option>
-                    </select>
+                    <Select
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isClearable
+                      isSearchable
+                      name="color"
+                      options={classOptions}
+                      onChange={handleChangeSelect("classes")}
+                    />
                   </div>
                 </div>
               </div>

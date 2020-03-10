@@ -1,16 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext, useReducer } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import axios from "axios";
+import Select from "react-select";
 
 import NumberFormat from "react-number-format";
 //Helpers
 import { getCookie } from "../../../utils/common/helpers";
+import { authReducer } from "../../../context/authReducer";
+import authContext from "../../../context/authContext";
 
 import SideBar from "../../common/SideBar";
 import Header from "../../common/Header";
 import Footer from "../../common/Footer";
 
 const StudentForm = ({ history }: RouteComponentProps) => {
+  const context = useContext(authContext);
+  const [state] = useReducer(authReducer, context);
+  const [loading, setLoading] = useState(false);
+  const [allClasses, setAllClasses] = useState(context.classes);
+
   const [studentData, setStudentData] = useState({
     name: "",
     fatherName: "",
@@ -38,11 +46,45 @@ const StudentForm = ({ history }: RouteComponentProps) => {
     mobile,
     classes
   } = studentData;
+  const token = getCookie("token");
+  useEffect(() => {
+    setLoading(true);
+    GetAllClasses();
+  }, []);
+
+  //Get All Classes
+  const GetAllClasses = () => {
+    setLoading(true);
+    axios({
+      method: "GET",
+      url: `${process.env.REACT_APP_API}/api/class/all`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        state.classes = res.data;
+        setAllClasses(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log(err);
+      });
+  };
+  //Class dataset for select
+  const classOptions = allClasses.map((val: any) => ({
+    value: val.title,
+    label: val.title
+  }));
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setStudentData({ ...studentData, [name]: event.currentTarget.value });
+  };
+  const handleChangeSelect = (name: string) => (event: any) => {
+    setStudentData({ ...studentData, [name]: event.value });
   };
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -267,22 +309,15 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                     </div>
                     <div className="form-group col-md-4">
                       <label>Class</label>
-                      <select
-                        onChange={handleChange("classes")}
-                        className="form-control "
-                        value={classes}
-                      >
-                        <option value="1st Class">1st Class</option>
-                        <option value="2nd Class">2nd Class</option>
-                        <option value="3th Class">3th Class</option>
-                        <option value="4th Class">4th Class</option>
-                        <option value="5th Class">5th Class</option>
-                        <option value="6th Class">6th Class</option>
-                        <option value="7th Class">7th Class</option>
-                        <option value="8th Class">8th Class</option>
-                        <option value="9th Class">9th Class</option>
-                        <option value="10th Class">10th Class</option>
-                      </select>
+                      <Select
+                        className="basic-single"
+                        classNamePrefix="select"
+                        isClearable
+                        isSearchable
+                        name="color"
+                        options={classOptions}
+                        onChange={handleChangeSelect("classes")}
+                      />
                     </div>
                   </div>
                 </div>

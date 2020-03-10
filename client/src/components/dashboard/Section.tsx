@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
-import Select, { GroupedOptionsType } from "react-select";
+import Select from "react-select";
 //Helpers
 import { getCookie } from "../../utils/common/helpers";
 
@@ -102,12 +102,16 @@ const Section = () => {
   ) => {
     setSectionData({ ...sectionData, [name]: event.currentTarget.value });
   };
-  const handleChangeSubject = (name: string) => (event: any) => {
+  const handleChangeSelect = (name: string) => (event: any) => {
     console.log(event);
-    if (event) {
-      let subjectValues = event.map((subj: any) => subj.value);
-      console.log(subjectValues);
-      setSectionData({ ...sectionData, [name]: subjectValues });
+    if (name === "subjects") {
+      if (event) {
+        let subjectValues = event.map((subj: any) => subj.value);
+        console.log(subjectValues);
+        setSectionData({ ...sectionData, [name]: subjectValues });
+      }
+    } else {
+      setSectionData({ ...sectionData, [name]: event.value });
     }
   };
 
@@ -118,7 +122,7 @@ const Section = () => {
     label: val.title
   }));
   const classOptions = allClasses.map((val: any) => ({
-    value: val.title,
+    value: val._id,
     label: val.title
   }));
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
@@ -231,6 +235,7 @@ const Section = () => {
                     isSearchable
                     name="color"
                     options={classOptions}
+                    onChange={handleChangeSelect("classes")}
                   />
                   {/* <select
                     onChange={handleChange("classes")}
@@ -254,7 +259,7 @@ const Section = () => {
                     options={subjectOptions}
                     className="basic-multi-select"
                     classNamePrefix="select"
-                    onChange={handleChangeSubject("subjects")}
+                    onChange={handleChangeSelect("subjects")}
                   />
                 </div>
               </div>
