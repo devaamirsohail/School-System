@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import axios from "axios";
+import Select from "react-select";
 
 import NumberFormat from "react-number-format";
 //Helpers
@@ -21,6 +22,7 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
   const [loading, setLoading] = useState(false);
   const { subjects } = context;
   const [allSubjects, setAllSubjects] = useState(subjects);
+  const [teacherSubject, setTeacherSubject] = useState(0);
 
   const token = getCookie("token");
   const { teacher } = context;
@@ -38,9 +40,37 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
     subject: teacher.subject
   });
   const id = match.params.id;
+  const {
+    name,
+    fatherName,
+    DOB,
+    dateOfJoining,
+    placeOfBirth,
+    sex,
+    nationality,
+    address,
+    telephone,
+    mobile,
+    subject
+  } = teacherData;
   useEffect(() => {
     setLoading(true);
-    axios({
+    GetAllSubjects();
+    GetTeacher();
+
+    const subjectIndex = subjectOptions.findIndex(
+      (subj: any) => subj.value === subject
+    );
+
+    setTeacherSubject(subjectIndex);
+    console.log("subjectIndex", subjectIndex);
+    console.log("teacherSubject", teacherSubject);
+    console.log("subject", subject);
+  }, []);
+  console.log(teacherSubject);
+  // Get Teacher By Id
+  const GetTeacher = async () => {
+    await axios({
       method: "GET",
       url: `${process.env.REACT_APP_API}/api/teacher?id=${id}`,
       headers: {
@@ -56,9 +86,10 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
         setLoading(false);
         console.log(err);
       });
-  }, []);
-  useEffect(() => {
-    axios({
+  };
+  // Get All Subjects
+  const GetAllSubjects = async () => {
+    await axios({
       method: "GET",
       url: `${process.env.REACT_APP_API}/api/subject/all`,
       headers: {
@@ -74,26 +105,24 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
         setLoading(false);
         console.log(err);
       });
-  }, []);
-  const {
-    name,
-    fatherName,
-    DOB,
-    dateOfJoining,
-    placeOfBirth,
-    sex,
-    nationality,
-    address,
-    telephone,
-    mobile,
-    subject
-  } = teacherData;
+  };
+  // Subject Dataset for select
+  const subjectOptions = allSubjects.map((val: any) => ({
+    value: val.title,
+    label: val.title
+  }));
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setTeacherData({ ...teacherData, [name]: event.currentTarget.value });
   };
+  const handleChangeSelect = (name: string) => (event: any) => {
+    console.log(event);
+
+    setTeacherData({ ...teacherData, [name]: event.value });
+  };
+  //Update Teacher
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const token = getCookie("token");
@@ -114,6 +143,7 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
       });
   };
 
+  // Teacher Form
   const EditForm = () => (
     <div className="content-wrapper">
       <section className="content-header">
@@ -312,19 +342,19 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
                       />
                     </div>
                   </div>
+
                   <div className="form-group col-md-4">
                     <label>Subject:</label>
-                    <select
-                      onChange={handleChange("subject")}
-                      className="form-control "
-                      value={subject}
-                    >
-                      {subjects.map((val: any, index) => (
-                        <option key={index} value={val.title}>
-                          {val.title}
-                        </option>
-                      ))}
-                    </select>
+                    <Select
+                      defaultValue={subjectOptions[teacherSubject]}
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isClearable
+                      isSearchable
+                      name="color"
+                      options={subjectOptions}
+                      onChange={handleChangeSelect("subject")}
+                    />
                   </div>
                 </div>
               </div>

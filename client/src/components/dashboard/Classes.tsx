@@ -1,16 +1,19 @@
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
+import Select from "react-select";
+
 //Helpers
 import { getCookie } from "../../utils/common/helpers";
 
 import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
-import Spinner from "../common/Spinner";
+import Pagination from "./common/Pagination";
 
 import SideBar from "../common/SideBar";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
+import Spinner from "../common/Spinner";
 
 const Classes = () => {
   const context = useContext(authContext);
@@ -28,7 +31,10 @@ const Classes = () => {
   const [allClasses, setAllClasses] = useState(context.classes);
   const [allTeachers, setAllTeachers] = useState(context.teachers);
   const { classes } = context;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [subjectPerPage, setClassPerPage] = useState(10);
   const [visible, setVisible] = useState(false);
+  //Remove Alert
   const onDismiss = () => setVisible(false);
   const token = getCookie("token");
   useEffect(() => {
@@ -36,6 +42,7 @@ const Classes = () => {
     GetAllClasses();
     GetAllTeachers();
   }, []);
+  //Get All Classes
   const GetAllClasses = () => {
     axios({
       method: "GET",
@@ -54,6 +61,7 @@ const Classes = () => {
         console.log(err);
       });
   };
+  //Get All Teachers
   const GetAllTeachers = () => {
     setLoading(true);
     axios({
@@ -79,13 +87,17 @@ const Classes = () => {
   ) => {
     setClassData({ ...classData, [name]: event.currentTarget.value });
   };
-  console.log(classData);
-  console.log(updateId);
+  const handleChangeSelect = (name: string) => (event: any) => {
+    console.log(event);
+
+    setClassData({ ...classData, [name]: event.value });
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     showEditForm ? updateClass() : addNewClass();
   };
+  //Add New Class
   const addNewClass = () => {
     axios({
       method: "POST",
@@ -105,6 +117,7 @@ const Classes = () => {
         console.log(err);
       });
   };
+  // Update Class
   const updateClass = () => {
     axios({
       method: "PUT",
@@ -126,6 +139,7 @@ const Classes = () => {
         console.log(err);
       });
   };
+  //Delete Class
   const handleDelete = (id: string) => {
     axios({
       method: "DELETE",
@@ -144,6 +158,7 @@ const Classes = () => {
         console.log(err);
       });
   };
+  // Show Edit Form
   const handleEdit = (id: string) => {
     setShowForm(true);
     setShowEditForm(true);
@@ -154,6 +169,41 @@ const Classes = () => {
       }
     });
   };
+  // Class Dataset for select
+  const teacherOptions = allTeachers.map((val: any) => ({
+    value: val._id,
+    label: val.name
+  }));
+  //Sorting Ascending
+  const handleAscSorting = (str: string) => {
+    let ascSortedClass = [...allClasses];
+    ascSortedClass.sort((a: any, b: any) => {
+      if (a[str].toLowerCase() < b[str].toLowerCase()) return -1;
+      if (a[str].toLowerCase() > b[str].toLowerCase()) return 1;
+      return 0;
+    });
+    setAllClasses(ascSortedClass);
+  };
+  //Sorting Descending
+  const handleDesSorting = (str: string) => {
+    let desSortedClass = [...allClasses];
+    desSortedClass.sort((a: any, b: any) => {
+      if (a[str].toLowerCase() < b[str].toLowerCase()) return 1;
+      if (a[str].toLowerCase() > b[str].toLowerCase()) return -1;
+      return 0;
+    });
+    setAllClasses(desSortedClass);
+  };
+  //Pagination
+  //Get Current Class
+  const indexOfLastClass = currentPage * subjectPerPage;
+  const indexOfFirstClass = indexOfLastClass - subjectPerPage;
+  const currentClasses = allClasses.slice(indexOfFirstClass, indexOfLastClass);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Class Form
   const addClassForm = () => (
     <section className="content">
       <div className="container-fluid">
@@ -181,17 +231,17 @@ const Classes = () => {
 
                 <div className="form-group col-md-4">
                   <label>Head of Class:</label>
-                  <select
-                    onChange={handleChange("HOC")}
-                    className="form-control "
-                    value={HOC}
-                  >
-                    {allTeachers.map((val: any, index) => (
-                      <option key={index} value={val._id}>
-                        {val.name}
-                      </option>
-                    ))}
-                  </select>
+
+                  <Select
+                    //defaultValue={classOptions}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    isClearable
+                    isSearchable
+                    name="color"
+                    options={teacherOptions}
+                    onChange={handleChangeSelect("HOC")}
+                  />
                 </div>
               </div>
             </div>
@@ -212,7 +262,7 @@ const Classes = () => {
       {/* /.container-fluid */}
     </section>
   );
-
+  // Class Table
   const classTable = () => (
     <section className="content">
       <div className="container-fluid">
@@ -251,9 +301,12 @@ const Classes = () => {
                               <button
                                 type="submit"
                                 className="btn btn-block btn-primary"
-                                onClick={() => setShowForm(!showForm)}
+                                onClick={() => {
+                                  setShowForm(!showForm);
+                                  setClassData({ title: "", HOC: "" });
+                                }}
                               >
-                                Add New Class
+                                {showForm ? "Hide Form" : "Add New Class"}
                               </button>
                             </div>
                           )}
@@ -265,13 +318,29 @@ const Classes = () => {
                           <thead>
                             <tr>
                               <th>Index</th>
-                              <th>Title</th>
+                              <th>
+                                Title{" "}
+                                <i
+                                  onClick={() => handleAscSorting("title")}
+                                  className="fas fa-arrow-up fa-xs float-right"
+                                  style={{
+                                    cursor: "pointer"
+                                  }}
+                                />
+                                <i
+                                  onClick={() => handleDesSorting("title")}
+                                  className="fas fa-arrow-down fa-xs float-right"
+                                  style={{
+                                    cursor: "pointer"
+                                  }}
+                                />
+                              </th>
                               <th>Head Of Class</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {allClasses.map((val: any, index) => {
+                            {currentClasses.map((val: any, index) => {
                               return (
                                 <tr key={index}>
                                   <td>{index + 1}</td>
@@ -308,6 +377,26 @@ const Classes = () => {
                         </table>
                       </div>
                       {/* /.card-body */}
+                      <div className="card-footer ">
+                        <div className="row">
+                          <div className="col-sm-12 col-md-5">
+                            <div className="dataTables_info">
+                              Showing {indexOfFirstClass + 1} to{" "}
+                              {indexOfLastClass > allClasses.length
+                                ? allClasses.length
+                                : indexOfLastClass}{" "}
+                              of {allClasses.length} entries
+                            </div>
+                          </div>
+                          <div className="col-sm-12 col-md-7">
+                            <Pagination
+                              postsPerPage={subjectPerPage}
+                              totalPosts={allClasses.length}
+                              paginate={paginate}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     {/* /.card */}
                   </div>

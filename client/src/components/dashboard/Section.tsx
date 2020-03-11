@@ -7,11 +7,12 @@ import { getCookie } from "../../utils/common/helpers";
 
 import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
-import Spinner from "../common/Spinner";
+import Pagination from "./common/Pagination";
 
 import SideBar from "../common/SideBar";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
+import Spinner from "../common/Spinner";
 
 const Section = () => {
   const context = useContext(authContext);
@@ -30,7 +31,8 @@ const Section = () => {
   const [allSections, setAllSections] = useState(context.sections);
   const [allClasses, setAllClasses] = useState(context.classes);
   const [allSubjects, setAllSubjects] = useState(context.subjects);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sectionPerPage, setSectionPerPage] = useState(10);
   const { sections } = context;
   const [visible, setVisible] = useState(false);
   const onDismiss = () => setVisible(false);
@@ -41,6 +43,7 @@ const Section = () => {
     GetAllClasses();
     GetAllSubjects();
   }, []);
+  //Get All Sections
   const GetAllSections = () => {
     axios({
       method: "GET",
@@ -59,6 +62,7 @@ const Section = () => {
         console.log(err);
       });
   };
+  //Get All Classes
   const GetAllClasses = () => {
     setLoading(true);
     axios({
@@ -78,6 +82,7 @@ const Section = () => {
         console.log(err);
       });
   };
+  //Get All Subjects
   const GetAllSubjects = () => {
     axios({
       method: "GET",
@@ -115,20 +120,23 @@ const Section = () => {
     }
   };
 
-  console.log(sectionData);
-  console.log(updateId);
+  // Subject Dataset for select
   const subjectOptions = allSubjects.map((val: any) => ({
     value: val.title,
     label: val.title
   }));
+  // Class Dataset for select
   const classOptions = allClasses.map((val: any) => ({
     value: val._id,
     label: val.title
   }));
+  // Add and Update Section
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     showEditForm ? updateSection() : addNewSection();
   };
+
+  //Add New Section
   const addNewSection = () => {
     axios({
       method: "POST",
@@ -148,6 +156,7 @@ const Section = () => {
         console.log(err);
       });
   };
+  // Update Section
   const updateSection = () => {
     axios({
       method: "PUT",
@@ -169,6 +178,7 @@ const Section = () => {
         console.log(err);
       });
   };
+  //Delete Section
   const handleDelete = (id: string) => {
     axios({
       method: "DELETE",
@@ -187,6 +197,8 @@ const Section = () => {
         console.log(err);
       });
   };
+
+  // Edit Section
   const handleEdit = (id: string) => {
     setShowForm(true);
     setShowEditForm(true);
@@ -201,6 +213,39 @@ const Section = () => {
       }
     });
   };
+
+  //Sorting Ascending
+  const handleAscSorting = (str: string) => {
+    let ascSortedSection = [...allSections];
+    ascSortedSection.sort((a: any, b: any) => {
+      if (a[str].toLowerCase() < b[str].toLowerCase()) return -1;
+      if (a[str].toLowerCase() > b[str].toLowerCase()) return 1;
+      return 0;
+    });
+    setAllSections(ascSortedSection);
+  };
+  //Sorting Descending
+  const handleDesSorting = (str: string) => {
+    let desSortedSection = [...allSections];
+    desSortedSection.sort((a: any, b: any) => {
+      if (a[str].toLowerCase() < b[str].toLowerCase()) return 1;
+      if (a[str].toLowerCase() > b[str].toLowerCase()) return -1;
+      return 0;
+    });
+    setAllSections(desSortedSection);
+  };
+  //Pagination
+  //Get Current Section
+  const indexOfLastSection = currentPage * sectionPerPage;
+  const indexOfFirstSection = indexOfLastSection - sectionPerPage;
+  const currentSections = allSections.slice(
+    indexOfFirstSection,
+    indexOfLastSection
+  );
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  // Section Form
   const addSectionForm = () => (
     <section className="content">
       <div className="container-fluid">
@@ -237,17 +282,6 @@ const Section = () => {
                     options={classOptions}
                     onChange={handleChangeSelect("classes")}
                   />
-                  {/* <select
-                    onChange={handleChange("classes")}
-                    className="form-control "
-                    value={classes}
-                  >
-                    {allClasses.map((val: any, index) => (
-                      <option key={index} value={val._id}>
-                        {val.title}
-                      </option>
-                    ))}
-                  </select> */}
                 </div>
 
                 <div className="form-group col-md-4">
@@ -282,6 +316,7 @@ const Section = () => {
     </section>
   );
 
+  //Sections Table
   const sectionTable = () => (
     <section className="content">
       <div className="container-fluid">
@@ -326,7 +361,7 @@ const Section = () => {
                                 className="btn btn-block btn-primary"
                                 onClick={() => setShowForm(!showForm)}
                               >
-                                Add New Section
+                                {showForm ? "Hide Form" : "Add New Section"}
                               </button>
                             </div>
                           )}
@@ -338,14 +373,30 @@ const Section = () => {
                           <thead>
                             <tr>
                               <th>Index</th>
-                              <th>Title</th>
+                              <th>
+                                Title
+                                <i
+                                  onClick={() => handleAscSorting("title")}
+                                  className="fas fa-arrow-up fa-xs float-right"
+                                  style={{
+                                    cursor: "pointer"
+                                  }}
+                                />
+                                <i
+                                  onClick={() => handleDesSorting("title")}
+                                  className="fas fa-arrow-down fa-xs float-right"
+                                  style={{
+                                    cursor: "pointer"
+                                  }}
+                                />
+                              </th>
                               <th>Class</th>
                               <th>Subjects</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {allSections.map((val: any, index) => {
+                            {currentSections.map((val: any, index) => {
                               return (
                                 <tr key={index}>
                                   <td>{index + 1}</td>
@@ -382,6 +433,26 @@ const Section = () => {
                         </table>
                       </div>
                       {/* /.card-body */}
+                      <div className="card-footer ">
+                        <div className="row">
+                          <div className="col-sm-12 col-md-5">
+                            <div className="dataTables_info">
+                              Showing {indexOfFirstSection + 1} to{" "}
+                              {indexOfLastSection > allSections.length
+                                ? allSections.length
+                                : indexOfLastSection}{" "}
+                              of {allSections.length} entries
+                            </div>
+                          </div>
+                          <div className="col-sm-12 col-md-7">
+                            <Pagination
+                              postsPerPage={sectionPerPage}
+                              totalPosts={allSections.length}
+                              paginate={paginate}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     {/* /.card */}
                   </div>

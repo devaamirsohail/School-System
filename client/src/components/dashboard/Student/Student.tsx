@@ -1,6 +1,6 @@
 import React from "react";
 
-import Table from "./Table";
+import StudentTable from "./Table";
 
 import SideBar from "../../common/SideBar";
 import Header from "../../common/Header";
@@ -10,7 +10,7 @@ const Main = () => (
   <React.Fragment>
     <Header />
     <SideBar />
-    <Table />
+    <StudentTable />
     <Footer />
   </React.Fragment>
 );

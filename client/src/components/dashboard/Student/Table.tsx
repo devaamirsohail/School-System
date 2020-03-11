@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
 import Select from "react-select";
-import NumberFormat from "react-number-format";
 
 //Helpers
 import { getCookie } from "../../../utils/common/helpers";
@@ -13,7 +12,7 @@ import authContext from "../../../context/authContext";
 import Spinner from "../../common/Spinner";
 import Pagination from "../common/Pagination";
 
-const Table = ({ history }: RouteComponentProps) => {
+const StudentTable = ({ history }: RouteComponentProps) => {
   const context = useContext(authContext);
   const [state] = useReducer(authReducer, context);
   const [loading, setLoading] = useState(false);
@@ -202,7 +201,7 @@ const Table = ({ history }: RouteComponentProps) => {
       setAllStudents(students);
     }
   };
-
+  // Student Table
   const studentTable = () => (
     <section className="content">
       <div className="container-fluid">
@@ -488,4 +487,4 @@ const Table = ({ history }: RouteComponentProps) => {
     </div>
   );
 };
-export default withRouter(Table);
+export default withRouter(StudentTable);
