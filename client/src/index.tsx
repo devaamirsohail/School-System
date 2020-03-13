@@ -16,6 +16,7 @@ const Index = () => {
   //   const [state] = useAut hState;
   const token = getCookie("token");
   const user = JSON.parse(localStorage.getItem("user")!);
+
   useEffect(() => {
     if (token) {
       const decoded: any = jwt_decode(token);

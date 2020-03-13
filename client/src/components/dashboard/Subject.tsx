@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext, useReducer } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
 //Helpers
-import { getCookie } from "../../utils/common/helpers";
 
 import { authReducer } from "../../context/authReducer";
 import authContext from "../../context/authContext";
@@ -25,7 +24,6 @@ const Subject = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [subjectPerPage, setSubjectPerPage] = useState(10);
   const onDismiss = () => setVisible(false);
-  const token = getCookie("token");
   useEffect(() => {
     setLoading(true);
     GetAllSubjects();
@@ -34,10 +32,7 @@ const Subject = () => {
   const GetAllSubjects = () => {
     axios({
       method: "GET",
-      url: `${process.env.REACT_APP_API}/api/subject/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      url: `${process.env.REACT_APP_API}/api/subject/all`
     })
       .then(res => {
         state.subjects = res.data;
@@ -57,9 +52,7 @@ const Subject = () => {
     axios({
       method: "POST",
       url: `${process.env.REACT_APP_API}/api/subject/add`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+
       data: subjectTitle
     })
       .then((res: any) => {
@@ -75,10 +68,7 @@ const Subject = () => {
   const handleDelete = (id: string) => {
     axios({
       method: "DELETE",
-      url: `${process.env.REACT_APP_API}/api/subject?id=${id}`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      url: `${process.env.REACT_APP_API}/api/subject?id=${id}`
     })
       .then(res => {
         state.subjects = subjects.filter((subject: any) => subject._id !== id);

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
 
 import PrivateRoute from "./components/common/PrivateRoute";
+import setAuthToken from "./utils/common/setAuthToken";
+import { getCookie } from "./utils/common/helpers";
 
 //import component
 import Login from "./components/auth/Login";
@@ -18,6 +20,11 @@ import Classes from "./components/dashboard/Classes";
 import Section from "./components/dashboard/Section";
 
 const App: React.FC = () => {
+  const token = getCookie("token");
+  if (token) {
+    setAuthToken(token);
+  }
+
   return (
     <Router>
       <Switch>

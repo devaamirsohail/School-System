@@ -54,22 +54,15 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
     subject
   } = teacherData;
   useEffect(() => {
-    setLoading(true);
     GetAllSubjects();
     GetTeacher();
-
-    const subjectIndex = subjectOptions.findIndex(
-      (subj: any) => subj.value === subject
-    );
-
-    setTeacherSubject(subjectIndex);
-    console.log("subjectIndex", subjectIndex);
-    console.log("teacherSubject", teacherSubject);
-    console.log("subject", subject);
+    getTeacherSubject();
   }, []);
-  console.log(teacherSubject);
+
   // Get Teacher By Id
   const GetTeacher = async () => {
+    setLoading(true);
+
     await axios({
       method: "GET",
       url: `${process.env.REACT_APP_API}/api/teacher?id=${id}`,
@@ -89,6 +82,8 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
   };
   // Get All Subjects
   const GetAllSubjects = async () => {
+    setLoading(true);
+
     await axios({
       method: "GET",
       url: `${process.env.REACT_APP_API}/api/subject/all`,
@@ -111,6 +106,16 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
     value: val.title,
     label: val.title
   }));
+  const getTeacherSubject = () => {
+    const subjectIndex = subjectOptions.findIndex(
+      (subj: any) => subj.value === subject
+    );
+
+    setTeacherSubject(subjectIndex);
+  };
+  console.log("teacherData", teacherData.subject);
+  console.log("teacherSubject", teacherSubject);
+  console.log("subject", context.teacher.subject);
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
@@ -346,7 +351,13 @@ const EditTeacher = ({ history, match }: RouteComponentProps<TParams>) => {
                   <div className="form-group col-md-4">
                     <label>Subject:</label>
                     <Select
-                      defaultValue={subjectOptions[teacherSubject]}
+                      defaultValue={
+                        subjectOptions[
+                          subjectOptions.findIndex(
+                            (subj: any) => subj.value === subject
+                          )
+                        ]
+                      }
                       className="basic-single"
                       classNamePrefix="select"
                       isClearable
