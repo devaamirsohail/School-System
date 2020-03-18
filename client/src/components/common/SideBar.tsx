@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SideBar = () => {
   return (
@@ -40,34 +41,65 @@ const SideBar = () => {
           >
             {/* Add icons to the links using the .nav-icon class
      with font-awesome or any other icon font library */}
-            <li className="nav-item has-treeview menu-open">
-              <a href="#" className="nav-link active">
-                <i className="nav-icon fas fa-tachometer-alt" />
-                <p>
-                  Dashboard
-                  <i className="right fas fa-angle-left" />
-                </p>
-              </a>
-              <ul className="nav nav-treeview">
-                <li className="nav-item">
-                  <a href="./index.html" className="nav-link active">
-                    <i className="far fa-circle nav-icon" />
-                    <p>Dashboard v1</p>
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a href="./index2.html" className="nav-link">
-                    <i className="far fa-circle nav-icon" />
-                    <p>Dashboard v2</p>
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a href="./index3.html" className="nav-link">
-                    <i className="far fa-circle nav-icon" />
-                    <p>Dashboard v3</p>
-                  </a>
-                </li>
-              </ul>
+            <li className="nav-item menu-open">
+              <Link to="/teachers" className="nav-link">
+                <i className="nav-icon fas fa-user-tie" />
+                Teachers
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/students" className="nav-link">
+                <i className="nav-icon fas fa-user-graduate" />
+                Students
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/subjects" className="nav-link">
+                <i className="nav-icon fas fa-book" />
+                Subjects
+              </Link>
+            </li>
+            <li className="nav-item menu-open">
+              <Link to="/staff" className="nav-link">
+                <i className="nav-icon fas fa-users" />
+                Staff
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/classes" className="nav-link">
+                <i className="nav-icon fas fa-cubes" />
+                Classes
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/section" className="nav-link">
+                <i className="nav-icon fas fa-puzzle-piece" />
+                Sections
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/timetable" className="nav-link">
+                <i className="nav-icon fas fa-calendar-times" />
+                Time Table
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/fee" className="nav-link">
+                <i className="nav-icon fas fa-hand-holding-usd" />
+                Fee
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/pay" className="nav-link">
+                <i className="nav-icon fas fa-dollar-sign" />
+                Pay
+              </Link>
+            </li>
+            <li className="nav-item ">
+              <Link to="/utility" className="nav-link">
+                <i className="nav-icon fas fa-file-invoice-dollar" />
+                Utilities
+              </Link>
             </li>
             <li className="nav-item">
               <a href="pages/widgets.html" className="nav-link">

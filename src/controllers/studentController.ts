@@ -13,7 +13,9 @@ export class studentController {
   //Add Student Controller
   AddStudent = (req: Request, res: Response) => {
     const { errors, isValid } = this.validateAddStudentInput(req.body);
-
+    console.log(typeof req.body.admissionFee.total);
+    console.log(typeof req.body.admissionFee.paid);
+    console.log(isValid);
     //Check Validation
     if (isValid.includes(false)) {
       return res.status(400).json(errors);
@@ -30,8 +32,11 @@ export class studentController {
       mobile,
       classes,
       DOB,
-      dateOfAdmission
+      dateOfAdmission,
+      admissionFee,
+      fee
     } = req.body;
+
     const newStudent = new Student({
       name,
       fatherName,
@@ -43,7 +48,9 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes
+      classes,
+      admissionFee,
+      fee
     });
 
     newStudent
@@ -68,7 +75,8 @@ export class studentController {
         sex: 1,
         address: 1,
         mobile: 1,
-        classes: 1
+        classes: 1,
+        fee: 1
       }
     )
 
@@ -95,7 +103,9 @@ export class studentController {
       telephone: 1,
       nationality: 1,
       dateOfAdmission: 1,
-      placeOfBirth: 1
+      placeOfBirth: 1,
+      admissionFee: 1,
+      fee: 1
     })
 
       .then(student => {
@@ -129,7 +139,9 @@ export class studentController {
       mobile,
       classes,
       DOB,
-      dateOfAdmission
+      dateOfAdmission,
+      admissionFee,
+      fee
     } = req.body;
 
     const studentFields = {
@@ -143,7 +155,9 @@ export class studentController {
       address,
       telephone,
       mobile,
-      classes
+      classes,
+      admissionFee,
+      fee
     };
 
     Student.findByIdAndUpdate(
@@ -178,7 +192,11 @@ export class studentController {
       address: "",
       telephone: "",
       mobile: "",
-      classes: ""
+      classes: "",
+      admissionFeeTotal: "",
+      admissionFeePaid: "",
+      feeTotal: "",
+      feePaid: ""
     };
     data.name = !isEmpty(data.name) ? data.name : "";
     data.fatherName = !isEmpty(data.fatherName) ? data.fatherName : "";
@@ -231,6 +249,28 @@ export class studentController {
     }
     if (Validator.isEmpty(data.classes)) {
       errors.classes = "Class field is required";
+    }
+    if (data.admissionFee !== undefined) {
+      if (data.admissionFee.total === undefined) {
+        errors.admissionFeeTotal = "Admission Fee total is required";
+      }
+      if (data.admissionFee.paid === undefined) {
+        errors.admissionFeePaid = "Admission Fee paid is required";
+      }
+    } else {
+      errors.admissionFeeTotal = "Admission Fee total is required";
+      errors.admissionFeePaid = "Admission Fee paid is required";
+    }
+    if (data.admissionFee !== undefined) {
+      if (data.fee.total === undefined) {
+        errors.feeTotal = "Fee total is required";
+      }
+      if (data.fee.paid === undefined) {
+        errors.feePaid = "Fee paid is required";
+      }
+    } else {
+      errors.feeTotal = "Fee total is required";
+      errors.feePaid = "Fee paid is required";
     }
 
     return {

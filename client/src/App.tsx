@@ -18,6 +18,10 @@ import Teacher from "./components/dashboard/Teacher/Teacher";
 import Subject from "./components/dashboard/Subject";
 import Classes from "./components/dashboard/Classes";
 import Section from "./components/dashboard/Section";
+import Timetable from "./components/dashboard/Timetable/Timetable";
+import Staff from "./components/dashboard/Staff/Staff";
+import StaffForm from "./components/dashboard/Staff/StaffForm";
+import EditStaff from "./components/dashboard/Staff/EditStaff";
 
 const App: React.FC = () => {
   const token = getCookie("token");
@@ -39,6 +43,10 @@ const App: React.FC = () => {
         <PrivateRoute exact path="/subjects" component={Subject} />
         <PrivateRoute exact path="/classes" component={Classes} />
         <PrivateRoute exact path="/section" component={Section} />
+        <PrivateRoute exact path="/timetable" component={Timetable} />
+        <PrivateRoute exact path="/staff" component={Staff} />
+        <PrivateRoute exact path="/addstaff" component={StaffForm} />
+        <PrivateRoute exact path="/staff/:id" component={EditStaff} />
       </Switch>
     </Router>
   );

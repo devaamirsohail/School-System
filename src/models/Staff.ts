@@ -1,9 +1,9 @@
 import { Schema, Document, model } from "mongoose";
 
-import { IStudent } from "../Interfaces/student.interface";
+import { IStaff } from "../Interfaces/staff.interface";
 
-//Student Schema
-const StudentSchema: Schema = new Schema(
+//Staff Schema
+const StaffSchema: Schema = new Schema(
   {
     name: {
       type: String,
@@ -17,7 +17,7 @@ const StudentSchema: Schema = new Schema(
       type: String,
       required: true
     },
-    dateOfAdmission: {
+    dateOfJoining: {
       type: String,
       required: true
     },
@@ -45,31 +45,11 @@ const StudentSchema: Schema = new Schema(
       type: String,
       required: true
     },
-    classes: {
+    role: {
       type: String,
       required: true
-    },
-    admissionFee: {
-      total: {
-        type: Number,
-        required: true
-      },
-      paid: {
-        type: Number,
-        required: true
-      }
-    },
-    fee: {
-      total: {
-        type: Number,
-        required: true
-      },
-      paid: {
-        type: Number,
-        required: true
-      }
     }
   },
   { timestamps: true }
 );
-export default model<IStudent & Document>("Student", StudentSchema);
+export default model<IStaff & Document>("Staff", StaffSchema);

@@ -4,7 +4,6 @@ import { Alert } from "reactstrap";
 import Select from "react-select";
 
 //Helpers
-import { getCookie } from "../../../utils/common/helpers";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
 
 import { authReducer } from "../../../context/authReducer";
@@ -12,38 +11,32 @@ import authContext from "../../../context/authContext";
 import Spinner from "../../common/Spinner";
 import Pagination from "../common/Pagination";
 
-const StudentTable = ({ history }: RouteComponentProps) => {
+const StaffTable = ({ history }: RouteComponentProps) => {
   const context = useContext(authContext);
   const [state] = useReducer(authReducer, context);
   const [loading, setLoading] = useState(false);
-  const [allStudents, setAllStudents] = useState(context.students);
-  const [allClasses, setAllClasses] = useState(context.classes);
-  const { students } = context;
+  const [allStaff, setAllStaff] = useState(context.staff);
+  const { staff } = context;
   const [visible, setVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [studentPerPage, setStudentPerPage] = useState(10);
+  const [staffPerPage, setStaffPerPage] = useState(10);
 
   // Remove Alert
   const onDismiss = () => setVisible(false);
-  const token = getCookie("token");
 
   useEffect(() => {
     setLoading(true);
-    GetAllStudents();
-    GetAllClasses();
+    GetAllStaff();
   }, []);
-  //Get All Students
-  const GetAllStudents = () => {
+  //Get All Staff
+  const GetAllStaff = () => {
     axios({
       method: "GET",
-      url: `${process.env.REACT_APP_API}/api/student/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      url: `${process.env.REACT_APP_API}/api/staff/all`
     })
       .then(res => {
-        state.students = res.data;
-        setAllStudents(res.data);
+        state.staff = res.data;
+        setAllStaff(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -51,31 +44,7 @@ const StudentTable = ({ history }: RouteComponentProps) => {
         console.log(err);
       });
   };
-  //Get All Classes
-  const GetAllClasses = () => {
-    setLoading(true);
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/class/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.classes = res.data;
-        setAllClasses(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
-  //Class dataset for select
-  const classOptions = allClasses.map((val: any) => ({
-    value: val.title,
-    label: val.title
-  }));
+
   //Gender dataset for select
   const genderOptions = [
     {
@@ -87,22 +56,19 @@ const StudentTable = ({ history }: RouteComponentProps) => {
       label: "Female"
     }
   ];
-  //Edit Student
+  //Edit Staff
   const handleEdit = (id: string) => {
-    history.push(`/student/${id}`);
+    history.push(`/staff/${id}`);
   };
-  //Delete Student
+  //Delete Staff
   const handleDelete = (id: string) => {
     axios({
       method: "DELETE",
-      url: `${process.env.REACT_APP_API}/api/student?id=${id}`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      url: `${process.env.REACT_APP_API}/api/staff?id=${id}`
     })
       .then(res => {
-        state.students = students.filter((student: any) => student._id !== id);
-        setAllStudents(state.students);
+        state.staff = staff.filter((staff: any) => staff._id !== id);
+        setAllStaff(state.staff);
         setVisible(true);
         console.log(res);
       })
@@ -112,97 +78,91 @@ const StudentTable = ({ history }: RouteComponentProps) => {
   };
   //Sorting Ascending
   const handleAscSorting = (str: string) => {
-    let ascSortedStudent = [...allStudents];
-    ascSortedStudent.sort((a: any, b: any) => {
+    let ascSortedStaff = [...allStaff];
+    ascSortedStaff.sort((a: any, b: any) => {
       if (a[str].toLowerCase() < b[str].toLowerCase()) return -1;
       if (a[str].toLowerCase() > b[str].toLowerCase()) return 1;
       return 0;
     });
-    setAllStudents(ascSortedStudent);
+    setAllStaff(ascSortedStaff);
   };
   //Sorting Descending
   const handleDesSorting = (str: string) => {
-    let desSortedStudent = [...allStudents];
-    desSortedStudent.sort((a: any, b: any) => {
+    let desSortedStaff = [...allStaff];
+    desSortedStaff.sort((a: any, b: any) => {
       if (a[str].toLowerCase() < b[str].toLowerCase()) return 1;
       if (a[str].toLowerCase() > b[str].toLowerCase()) return -1;
       return 0;
     });
-    setAllStudents(desSortedStudent);
+    setAllStaff(desSortedStaff);
   };
   //Pagination
-  //Get Current Student
-  const indexOfLastStudent = currentPage * studentPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentPerPage;
-  const currentStudents = allStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
+  //Get Current Staff
+  const indexOfLastStaff = currentPage * staffPerPage;
+  const indexOfFirstStaff = indexOfLastStaff - staffPerPage;
+  const currentStaff = allStaff.slice(indexOfFirstStaff, indexOfLastStaff);
 
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   // Search Table By Name and Father Name
   const handleSearch = (event: any) => {
     const searchInput = event.currentTarget.value.toLowerCase();
-    let searchStudents = [...students];
+    let searchStaff = [...staff];
     let result: any = [];
-    for (var i = 0; i < searchStudents.length; i++) {
-      if (searchStudents[i].name.toLowerCase().includes(searchInput)) {
-        result.push(searchStudents[i]);
+    for (var i = 0; i < searchStaff.length; i++) {
+      if (searchStaff[i].name.toLowerCase().includes(searchInput)) {
+        result.push(searchStaff[i]);
       } else if (
-        searchStudents[i].fatherName.toLowerCase().includes(searchInput)
+        searchStaff[i].fatherName.toLowerCase().includes(searchInput)
       ) {
-        result.push(searchStudents[i]);
+        result.push(searchStaff[i]);
       }
     }
-    setAllStudents(result);
+    setAllStaff(result);
+  };
+  // Search Table By Role
+  const handleSearchByRole = (event: any) => {
+    const searchInput = event.currentTarget.value.toLowerCase();
+    let searchStaff = [...staff];
+    let result: any = [];
+    for (var i = 0; i < searchStaff.length; i++) {
+      if (searchStaff[i].role.toLowerCase().includes(searchInput)) {
+        result.push(searchStaff[i]);
+      }
+    }
+    setAllStaff(result);
   };
   // Search Table By Mobile
   const handleSearchByMobile = (event: any) => {
     const searchInput = event.currentTarget.value;
-    let searchStudents = [...students];
+    let searchStaff = [...staff];
     let result: any = [];
-    for (var i = 0; i < searchStudents.length; i++) {
-      if (searchStudents[i].mobile.includes(searchInput)) {
-        result.push(searchStudents[i]);
+    for (var i = 0; i < searchStaff.length; i++) {
+      if (searchStaff[i].mobile.includes(searchInput)) {
+        result.push(searchStaff[i]);
       }
     }
-    setAllStudents(result);
+    setAllStaff(result);
   };
-  // Search Table By Class
-  const handleSearchByClass = (event: any) => {
-    if (event) {
-      const searchInput = event.value;
-      let searchStudents = [...students];
-      let result: any = [];
-      for (var i = 0; i < searchStudents.length; i++) {
-        if (searchStudents[i].classes.includes(searchInput)) {
-          result.push(searchStudents[i]);
-        }
-      }
-      setAllStudents(result);
-    } else {
-      setAllStudents(students);
-    }
-  };
+
   // Search Table By Gender
   const handleSearchByGender = (event: any) => {
     if (event) {
       const searchInput = event.value;
-      let searchStudents = [...students];
+      let searchStaff = [...staff];
       let result: any = [];
-      for (var i = 0; i < searchStudents.length; i++) {
-        if (searchStudents[i].sex.includes(searchInput)) {
-          result.push(searchStudents[i]);
+      for (var i = 0; i < searchStaff.length; i++) {
+        if (searchStaff[i].sex.includes(searchInput)) {
+          result.push(searchStaff[i]);
         }
       }
-      setAllStudents(result);
+      setAllStaff(result);
     } else {
-      setAllStudents(students);
+      setAllStaff(staff);
     }
   };
-  // Student Table
-  const studentTable = () => (
+  // Staff Table
+  const staffTable = () => (
     <section className="content">
       <div className="container-fluid">
         <div className="row">
@@ -213,18 +173,18 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                   <div className="col-12">
                     <div className="card">
                       <div className="card-header">
-                        <h3 className="card-title">All Students</h3>
+                        <h3 className="card-title">All Staff</h3>
                         <div className="card-tools">
                           <div
                             className="input-group input-group-sm"
                             style={{ width: 150 }}
                           >
                             <Link
-                              to="/addstudent"
+                              to="/addstaff"
                               type="button"
                               className="btn btn-block btn-primary"
                             >
-                              Add New Student
+                              Add New Staff
                             </Link>
                           </div>
                         </div>
@@ -245,7 +205,6 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                 />
                               </td>
                               <td></td>
-
                               <td>
                                 <Select
                                   className="basic-single "
@@ -265,18 +224,13 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                   onChange={handleSearchByMobile}
                                 />
                               </td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
                               <td colSpan={2}>
-                                <Select
-                                  className="basic-single"
-                                  classNamePrefix="select"
-                                  isClearable
-                                  isSearchable
-                                  name="color"
-                                  options={classOptions}
-                                  onChange={handleSearchByClass}
+                                {" "}
+                                <input
+                                  type="search"
+                                  className="form-control "
+                                  placeholder="Search"
+                                  onChange={handleSearchByRole}
                                 />
                               </td>
                             </tr>
@@ -317,16 +271,20 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                               </th>
                               {/* <th>Father Name</th> */}
                               <th>
-                                Date of Birth
+                                Date of Joining
                                 <i
-                                  onClick={() => handleAscSorting("DOB")}
+                                  onClick={() =>
+                                    handleAscSorting("dateOfJoining")
+                                  }
                                   className="fas fa-arrow-up fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
                                   }}
                                 />
                                 <i
-                                  onClick={() => handleDesSorting("DOB")}
+                                  onClick={() =>
+                                    handleDesSorting("dateOfJoining")
+                                  }
                                   className="fas fa-arrow-down fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
@@ -367,20 +325,17 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                   }}
                                 />
                               </th>
-                              <th>Fee</th>
-                              <th>Paid</th>
-                              <th>Balance</th>
                               <th>
-                                Class
+                                Role
                                 <i
-                                  onClick={() => handleAscSorting("classes")}
+                                  onClick={() => handleAscSorting("role")}
                                   className="fas fa-arrow-up fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
                                   }}
                                 />
                                 <i
-                                  onClick={() => handleDesSorting("classes")}
+                                  onClick={() => handleDesSorting("role")}
                                   className="fas fa-arrow-down fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
@@ -391,30 +346,19 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                             </tr>
                           </thead>
                           <tbody>
-                            {currentStudents.length > 0 &&
-                              currentStudents.map((student: any, index) => {
+                            {currentStaff.length > 0 &&
+                              currentStaff.map((staff: any, index) => {
                                 return (
                                   <tr key={index}>
-                                    <td>{student.name}</td>
-                                    <td>{student.fatherName}</td>
-                                    <td>{student.DOB}</td>
-                                    <td>{student.sex}</td>
-                                    <td>{student.mobile}</td>
-                                    <td>
-                                      {student.fee ? student.fee.total : 0}
-                                    </td>
-                                    <td>
-                                      {student.fee ? student.fee.paid : 0}
-                                    </td>
-                                    <td>
-                                      {student.fee
-                                        ? student.fee.total - student.fee.paid
-                                        : 0}
-                                    </td>
-                                    <td>{student.classes}</td>
+                                    <td>{staff.name}</td>
+                                    <td>{staff.fatherName}</td>
+                                    <td>{staff.dateOfJoining}</td>
+                                    <td>{staff.sex}</td>
+                                    <td>{staff.mobile}</td>
+                                    <td>{staff.role}</td>
                                     <td>
                                       <i
-                                        onClick={() => handleEdit(student._id)}
+                                        onClick={() => handleEdit(staff._id)}
                                         className="far fa-edit pr-2"
                                         style={{
                                           color: "#28a745",
@@ -422,9 +366,7 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                         }}
                                       ></i>
                                       <i
-                                        onClick={() =>
-                                          handleDelete(student._id)
-                                        }
+                                        onClick={() => handleDelete(staff._id)}
                                         className="far fa-trash-alt"
                                         style={{
                                           color: "#dc3545",
@@ -443,17 +385,21 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                         <div className="row">
                           <div className="col-sm-12 col-md-5">
                             <div className="dataTables_info">
-                              Showing {indexOfFirstStudent + 1} to{" "}
-                              {indexOfLastStudent > allStudents.length
-                                ? allStudents.length
-                                : indexOfLastStudent}{" "}
-                              of {allStudents.length} entries
+                              Showing{" "}
+                              {allStaff.length > 0
+                                ? indexOfFirstStaff + 1
+                                : "0"}{" "}
+                              to{" "}
+                              {indexOfLastStaff > allStaff.length
+                                ? allStaff.length
+                                : indexOfLastStaff}{" "}
+                              of {allStaff.length} entries
                             </div>
                           </div>
                           <div className="col-sm-12 col-md-7">
                             <Pagination
-                              postsPerPage={studentPerPage}
-                              totalPosts={allStudents.length}
+                              postsPerPage={staffPerPage}
+                              totalPosts={allStaff.length}
                               paginate={paginate}
                             />
                           </div>
@@ -481,7 +427,7 @@ const StudentTable = ({ history }: RouteComponentProps) => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0 text-dark">Students</h1>
+              <h1 className="m-0 text-dark">Staff</h1>
             </div>
             {/* /.col */}
             <div className="col-sm-6">
@@ -489,20 +435,20 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                 <li className="breadcrumb-item">
                   <a href="#">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Sudents</li>
+                <li className="breadcrumb-item active">Staff</li>
               </ol>
             </div>
             {/* /.col */}
           </div>
           <Alert color="success" isOpen={visible} toggle={onDismiss}>
             <h4 className="alert-heading">Success</h4>
-            <p>You have successfully deleted the student</p>
+            <p>You have successfully deleted the staff memeber</p>
           </Alert>
         </div>
         {/* /.container-fluid */}
       </div>
-      {loading ? <Spinner /> : studentTable()}
+      {loading ? <Spinner /> : staffTable()}
     </div>
   );
 };
-export default withRouter(StudentTable);
+export default withRouter(StaffTable);

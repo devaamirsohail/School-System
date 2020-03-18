@@ -5,14 +5,14 @@ import Validator from "validator";
 import isEmpty from "../validator/is-empty";
 
 //import user model
-import Teacher from "../models/Teacher";
+import Staff from "../models/Staff";
 
-import { ITeacher } from "../Interfaces/teacher.interface";
+import { IStaff } from "../Interfaces/staff.interface";
 
-export class teacherController {
-  //Add Teacher Controller
-  AddTeacher = (req: Request, res: Response) => {
-    const { errors, isValid } = this.validateAddTeacherInput(req.body);
+export class staffController {
+  //Add Staff Controller
+  AddStaff = (req: Request, res: Response) => {
+    const { errors, isValid } = this.validateAddStaffInput(req.body);
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -28,11 +28,11 @@ export class teacherController {
       address,
       telephone,
       mobile,
-      subject,
+      role,
       DOB,
       dateOfJoining
     } = req.body;
-    const newTeacher = new Teacher({
+    const newStaff = new Staff({
       name,
       fatherName,
       DOB,
@@ -43,23 +43,23 @@ export class teacherController {
       address,
       telephone,
       mobile,
-      subject
+      role
     });
 
-    newTeacher
+    newStaff
       .save()
       .then(user => res.json(user))
       .catch(err => {
         console.log(err);
         res.json({
-          error: "Error in saving teacher to database, try again."
+          error: "Error in saving staff to database, try again."
         });
       });
   };
 
-  //Get All Teacher Controller
-  GetAllTeachers = (req: Request, res: Response) => {
-    Teacher.find(
+  //Get All Staff Controller
+  GetAllStaff = (req: Request, res: Response) => {
+    Staff.find(
       {},
       {
         name: 1,
@@ -68,50 +68,50 @@ export class teacherController {
         sex: 1,
         address: 1,
         mobile: 1,
-        subject: 1
+        role: 1
       }
     )
 
-      .then(Teachers => {
-        if (!Teachers) {
+      .then(Staff => {
+        if (!Staff) {
           return res.status(404).json({
-            error: "There are no Teachers"
+            error: "There are no Staff"
           });
         }
-        res.json(Teachers);
+        res.json(Staff);
       })
       .catch(err => res.status(404).json(err));
   };
-  //Get Single Teacher Controller
-  GetTeacher = (req: Request, res: Response) => {
-    Teacher.findById(req.query.id, {
+  //Get Single Staff Controller
+  GetStaff = (req: Request, res: Response) => {
+    Staff.findById(req.query.id, {
       name: 1,
       fatherName: 1,
       DOB: 1,
       sex: 1,
       address: 1,
       mobile: 1,
-      subject: 1,
+      role: 1,
       telephone: 1,
       nationality: 1,
       dateOfJoining: 1,
       placeOfBirth: 1
     })
 
-      .then(teacher => {
-        if (!teacher) {
+      .then(staff => {
+        if (!staff) {
           return res.status(404).json({
-            error: "Teacher not found!"
+            error: "Staff not found!"
           });
         }
-        res.json(teacher);
+        res.json(staff);
       })
       .catch(err => res.status(404).json(err));
   };
 
-  //Update Teacher Controller
-  UpdateTeacher = (req: Request, res: Response) => {
-    const { errors, isValid } = this.validateAddTeacherInput(req.body);
+  //Update Staff Controller
+  UpdateStaff = (req: Request, res: Response) => {
+    const { errors, isValid } = this.validateAddStaffInput(req.body);
 
     //Check Validation
     if (isValid.includes(false)) {
@@ -127,12 +127,12 @@ export class teacherController {
       address,
       telephone,
       mobile,
-      subject,
+      role,
       DOB,
       dateOfJoining
     } = req.body;
 
-    const teacherFields = {
+    const staffFields = {
       name,
       fatherName,
       DOB,
@@ -143,30 +143,26 @@ export class teacherController {
       address,
       telephone,
       mobile,
-      subject
+      role
     };
 
-    Teacher.findByIdAndUpdate(
-      req.query.id,
-      { $set: teacherFields },
-      { new: true }
-    )
-      .then(teacher => {
-        res.json(teacher);
+    Staff.findByIdAndUpdate(req.query.id, { $set: staffFields }, { new: true })
+      .then(staff => {
+        res.json(staff);
       })
       .catch(err => res.status(404).json(err));
   };
-  //Delete Teacher Controller
-  DeleteTeacher = (req: Request, res: Response) => {
-    Teacher.findByIdAndDelete(req.query.id)
+  //Delete Staff Controller
+  DeleteStaff = (req: Request, res: Response) => {
+    Staff.findByIdAndDelete(req.query.id)
       .then(() => {
         res.json({ success: true });
       })
       .catch(err => res.status(404).json(err));
   };
 
-  //Validate Add Teacher Inputs
-  validateAddTeacherInput = (data: ITeacher): any => {
+  //Validate Add Staff Inputs
+  validateAddStaffInput = (data: IStaff): any => {
     let errors = {
       name: "",
       fatherName: "",
@@ -178,7 +174,7 @@ export class teacherController {
       address: "",
       telephone: "",
       mobile: "",
-      subject: ""
+      role: ""
     };
     data.name = !isEmpty(data.name) ? data.name : "";
     data.fatherName = !isEmpty(data.fatherName) ? data.fatherName : "";
@@ -190,7 +186,7 @@ export class teacherController {
     data.address = !isEmpty(data.address) ? data.address : "";
     data.telephone = !isEmpty(data.telephone) ? data.telephone : "";
     data.mobile = !isEmpty(data.mobile) ? data.mobile : "";
-    data.subject = !isEmpty(data.subject) ? data.subject : "";
+    data.role = !isEmpty(data.role) ? data.role : "";
 
     if (Validator.isEmpty(data.name)) {
       errors.name = "Name is required";
@@ -227,8 +223,8 @@ export class teacherController {
     if (Validator.isEmpty(data.mobile)) {
       errors.mobile = "Mobile field is required";
     }
-    if (Validator.isEmpty(data.subject)) {
-      errors.subject = "Subject field is required";
+    if (Validator.isEmpty(data.role)) {
+      errors.role = "Role field is required";
     }
 
     return {

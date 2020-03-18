@@ -30,7 +30,9 @@ const StudentForm = ({ history }: RouteComponentProps) => {
     address: "",
     telephone: "",
     mobile: "",
-    classes: "1st Class"
+    classes: "1st Class",
+    admissionFee: 0,
+    fee: 0
   });
 
   const {
@@ -44,7 +46,9 @@ const StudentForm = ({ history }: RouteComponentProps) => {
     address,
     telephone,
     mobile,
-    classes
+    classes,
+    admissionFee,
+    fee
   } = studentData;
   const token = getCookie("token");
   useEffect(() => {
@@ -82,6 +86,7 @@ const StudentForm = ({ history }: RouteComponentProps) => {
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setStudentData({ ...studentData, [name]: event.currentTarget.value });
+    console.log(studentData);
   };
   const handleChangeSelect = (name: string) => (event: any) => {
     setStudentData({ ...studentData, [name]: event.value });
@@ -230,7 +235,27 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                         </div>
                       </div>
                     </div>
-
+                    <div className="form-group col-md-4">
+                      <label>Admission Fee</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder="Admission Fee"
+                        onChange={handleChange("admissionFee")}
+                      />
+                    </div>{" "}
+                    <div className="form-group col-md-4">
+                      <label>Fee</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder="Fee"
+                        onChange={handleChange("fee")}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    {/* left column */}
                     <div className="form-group col-md-4">
                       <label>Date of Birth:</label>
                       <div className="input-group">
@@ -270,9 +295,7 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                         />
                       </div>
                     </div>
-                  </div>
-                  <div className="row">
-                    {/* left column */}
+
                     <div className="form-group col-md-4">
                       <label>Telephone</label>
                       <div className="input-group">
@@ -290,6 +313,8 @@ const StudentForm = ({ history }: RouteComponentProps) => {
                         />
                       </div>
                     </div>
+                  </div>
+                  <div className="row">
                     <div className="form-group col-md-4">
                       <label>Mobile</label>
                       <div className="input-group">

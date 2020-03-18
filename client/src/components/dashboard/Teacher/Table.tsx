@@ -475,7 +475,7 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
                 <li className="breadcrumb-item">
                   <a href="#">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Sudents</li>
+                <li className="breadcrumb-item active">Staff</li>
               </ol>
             </div>
             {/* /.col */}
