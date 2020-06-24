@@ -5,18 +5,17 @@ import Validator from "validator";
 import * as expressJwt from "express-jwt";
 
 import { JWT_SECRET } from "../config/constants";
+import { conn } from "../config/mysql";
 
 //import validator
 import isEmpty from "../validator/is-empty";
-
-//import user model
-import User from "../models/User";
 
 import { IUser } from "../Interfaces/user.interface";
 
 export class authController {
   //Register Controller
-  Register = (req: Request, res: Response) => {
+
+  Register = async (req: Request, res: Response) => {
     const { errors, isValid } = this.validateRegisterInput(req.body);
 
     //Check Validation
@@ -24,38 +23,57 @@ export class authController {
       return res.status(400).json(errors);
     }
     //Register Controller
-    const { fname, lname, email, role, password } = req.body;
-    User.findOne({ email }).then(user => {
-      if (user) {
-        errors.email = "Email already exists";
-        return res.status(400).json(errors);
-      } else {
-        const newUser = new User({ fname, lname, email, role, password });
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
+    const { fname, lname, email, role } = req.body;
+
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(req.body.password, salt, async (err, hash) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        const password = hash;
+        conn.query(
+          "SELECT * FROM users WHERE email = ?",
+          email,
+          (err, user) => {
             if (err) {
-              return res.status(400).json({
+              return res.status(500).json({
                 error: "Something went wrong, try again!"
               });
             }
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => res.json(user))
-              .catch(err => {
-                console.log(err);
-                res.json({
-                  error:
-                    "Error in saving user to database, please signup again."
-                });
-              });
-          });
-        });
-      }
+            if (!user[0]) {
+              conn.query(
+                "INSERT INTO users SET ?",
+                {
+                  fname,
+                  lname,
+                  email,
+                  role,
+                  password
+                },
+                (err, user) => {
+                  if (err) {
+                    return res.status(500).json({
+                      error: "Something went wrong, try again!"
+                    });
+                  }
+                  res.json({
+                    message: "User Registered Successfully."
+                  });
+                }
+              );
+            } else {
+              errors.email = "Email already exists";
+              return res.status(400).json(errors);
+            }
+          }
+        );
+      });
     });
   };
   //Login Controller
-  Login = (req: Request, res: Response) => {
+  Login = async (req: Request, res: Response) => {
     const { errors, isValid } = this.validateLoginInput(req.body);
 
     //Check Validation
@@ -64,52 +82,43 @@ export class authController {
     }
     const { email, password } = req.body;
     //Check for user
-    User.findOne({ email })
-      .then(user => {
-        if (!user) {
-          return res.status(400).json({
-            error: "User not found, Please Signup."
-          });
-        }
-        //Check Password
-        bcrypt
-          .compare(password, user.password)
-          .then(isMatch => {
-            //authenticate
-            if (!isMatch) {
-              errors.password = "Password incorrect";
-              return res.status(400).json(errors);
-            }
-            // Sign token and send to user
-            const token = jwt.sign(
-              {
-                _id: user._id,
-                role: user.role
-              },
-              JWT_SECRET,
-              {
-                expiresIn: "24h"
-              }
-            );
-            const { _id, fname, lname, email } = user;
-            return res.json({
-              token,
-              user: { _id, fname, lname, email }
-            });
-          })
-          .catch(err => {
-            console.log(err);
-            return res.json({
-              message: "Something went wrong, Please try again."
-            });
-          });
-      })
-      .catch(err => {
-        console.log("Signin Error:", err);
-        return res.json({
-          message: "Something went wrong, Please try again."
+
+    conn.query("SELECT * FROM users WHERE email = ?", email, (err, user) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
         });
-      });
+      }
+      if (Object.keys(user[0]).length !== 0) {
+        bcrypt.compare(password, user[0].password).then(isMatch => {
+          //authenticate
+          if (!isMatch) {
+            errors.password = "Password incorrect";
+            return res.status(400).json(errors);
+          }
+          // Sign token and send to user
+          const token = jwt.sign(
+            {
+              id: user[0].id,
+              role: user[0].role
+            },
+            JWT_SECRET,
+            {
+              expiresIn: "24h"
+            }
+          );
+          const { id, fname, lname, email } = user[0];
+          return res.json({
+            token,
+            user: { id, fname, lname, email }
+          });
+        });
+      } else {
+        return res.status(400).json({
+          error: "User not found, Please Signup."
+        });
+      }
+    });
   };
 
   //Validate Register Inputs

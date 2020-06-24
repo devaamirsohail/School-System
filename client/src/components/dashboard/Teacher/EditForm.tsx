@@ -1,34 +1,23 @@
-import React, { useState, useEffect, useContext, useReducer } from "react";
-import { Link, RouteComponentProps } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Select from "react-select";
-
 import NumberFormat from "react-number-format";
 //Helpers
 
-import { authReducer } from "../../../context/authReducer";
-import authContext from "../../../context/authContext";
-
-import SideBar from "../../common/SideBar";
-import Header from "../../common/Header";
-import Footer from "../../common/Footer";
-import Spinner from "../../common/Spinner";
-
-const StaffForm = ({ history }: RouteComponentProps) => {
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
-  const [staffData, setStaffData] = useState({
-    name: "",
-    fatherName: "",
-    DOB: "",
-    dateOfJoining: "",
-    placeOfBirth: "",
-    sex: "Male",
-    nationality: "",
-    address: "",
-    telephone: "",
-    mobile: "",
-    role: ""
+const TeacherForm = (props: any) => {
+  const { subjects, teacher } = props;
+  const [teacherData, setTeacherData] = useState({
+    name: teacher.name,
+    fatherName: teacher.fatherName,
+    DOB: teacher.DOB,
+    dateOfJoining: teacher.dateOfJoining,
+    placeOfBirth: teacher.placeOfBirth,
+    sex: teacher.sex,
+    nationality: teacher.nationality,
+    address: teacher.address,
+    telephone: teacher.telephone,
+    mobile: teacher.mobile,
+    subject: teacher.subject
   });
 
   const {
@@ -42,68 +31,59 @@ const StaffForm = ({ history }: RouteComponentProps) => {
     address,
     telephone,
     mobile,
-    role
-  } = staffData;
+    subject
+  } = teacherData;
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setStaffData({ ...staffData, [name]: event.currentTarget.value });
+    setTeacherData({ ...teacherData, [name]: event.currentTarget.value });
   };
-
-  //Add New Staff
+  const handleChangeSelect = (name: string) => (event: any) => {
+    if (event) {
+      setTeacherData({ ...teacherData, [name]: event.value });
+    }
+  };
+  //Add New Teacher
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    axios({
-      method: "POST",
-      url: `${process.env.REACT_APP_API}/api/staff/add`,
-
-      data: staffData
-    })
-      .then(res => {
-        console.log(res);
-        history.push("/staff");
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    props.AddTeacher(teacherData);
   };
 
-  // Staff Form
-  const AddForm = () => (
+  // Subject Dataset for select
+  const subjectOptions = subjects.map((val: any) => ({
+    value: val.title,
+    label: val.title
+  }));
+
+  return (
     <div className="content-wrapper">
       <section className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Add Staff</h1>
+              <h1>Add Teacher</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item">
                   <Link to="/dashboard">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Add Staff</li>
+                <li className="breadcrumb-item active">Add Teacher</li>
               </ol>
             </div>
           </div>
         </div>
-        {/* /.container-fluid */}
       </section>
-
       <section className="content">
         <div className="container-fluid">
-          {/* general form elements */}
           <div className="card card-primary">
             <div className="card-header">
-              <h3 className="card-title">Staff Form</h3>
+              <h3 className="card-title">Teacher Form</h3>
             </div>
-            {/* /.card-header */}
-            {/* form start */}
             <form role="form">
               <div className="card-body">
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Name</label>
                     <input
@@ -136,7 +116,6 @@ const StaffForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Place of Birth</label>
                     <input
@@ -159,7 +138,6 @@ const StaffForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Sex</label>
                     <div className="form-group clearfix row">
@@ -209,10 +187,7 @@ const StaffForm = ({ history }: RouteComponentProps) => {
                         onChange={handleChange("DOB")}
                       />
                     </div>
-
-                    {/* /.input group */}
                   </div>
-
                   <div className="form-group col-md-4">
                     <label>Date of Joining:</label>
                     <div className="input-group">
@@ -233,7 +208,6 @@ const StaffForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Telephone</label>
                     <div className="input-group">
@@ -269,44 +243,40 @@ const StaffForm = ({ history }: RouteComponentProps) => {
                     </div>
                   </div>
                   <div className="form-group col-md-4">
-                    <label>Role:</label>
-
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Role"
-                      value={role}
-                      onChange={handleChange("role")}
+                    <label>Subject:</label>
+                    <Select
+                      defaultValue={
+                        subjectOptions[
+                          subjectOptions.findIndex(
+                            (subject: any) => subject.value === teacher.subject
+                          )
+                        ]
+                      }
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isClearable
+                      isSearchable
+                      name="color"
+                      options={subjectOptions}
+                      onChange={handleChangeSelect("subject")}
                     />
                   </div>
                 </div>
               </div>
-              {/* /.card-body */}
               <div className="card-footer">
                 <button
                   type="submit"
                   onClick={handleSubmit}
                   className="btn btn-success"
                 >
-                  Add
+                  Update
                 </button>
               </div>
             </form>
           </div>
         </div>
-
-        {/* /.container-fluid */}
       </section>
     </div>
   );
-
-  return (
-    <React.Fragment>
-      <Header />
-      <SideBar />
-      {AddForm()}
-      <Footer />
-    </React.Fragment>
-  );
 };
-export default StaffForm;
+export default TeacherForm;

@@ -41,7 +41,7 @@ const SideBar = () => {
           >
             {/* Add icons to the links using the .nav-icon class
      with font-awesome or any other icon font library */}
-            <li className="nav-item menu-open">
+            <li className="nav-item active">
               <Link to="/teachers" className="nav-link">
                 <i className="nav-icon fas fa-user-tie" />
                 Teachers
@@ -59,8 +59,8 @@ const SideBar = () => {
                 Subjects
               </Link>
             </li>
-            <li className="nav-item menu-open">
-              <Link to="/staff" className="nav-link">
+            <li className="nav-item   ">
+              <Link to="/staff" className="nav-link disabled">
                 <i className="nav-icon fas fa-users" />
                 Staff
               </Link>
@@ -78,7 +78,7 @@ const SideBar = () => {
               </Link>
             </li>
             <li className="nav-item ">
-              <Link to="/timetable" className="nav-link">
+              <Link to="/timetable" className="nav-link disabled">
                 <i className="nav-icon fas fa-calendar-times" />
                 Time Table
               </Link>

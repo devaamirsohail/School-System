@@ -6,6 +6,7 @@ import isEmpty from "../validator/is-empty";
 
 //import user model
 import Teacher from "../models/Teacher";
+import { conn } from "../config/mysql";
 
 import { ITeacher } from "../Interfaces/teacher.interface";
 
@@ -19,94 +20,56 @@ export class teacherController {
       return res.status(400).json(errors);
     }
     //Register Controller
-    const {
-      name,
-      fatherName,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      subject,
-      DOB,
-      dateOfJoining
-    } = req.body;
-    const newTeacher = new Teacher({
-      name,
-      fatherName,
-      DOB,
-      dateOfJoining,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      subject
-    });
+    const teacherFields = req.body;
 
-    newTeacher
-      .save()
-      .then(user => res.json(user))
-      .catch(err => {
+    conn.query("INSERT INTO teachers SET?", [teacherFields], (err, teacher) => {
+      if (err) {
         console.log(err);
-        res.json({
+        return res.status(500).json({
           error: "Error in saving teacher to database, try again."
         });
+      }
+      res.json({
+        message: "Teacher Added Successfully"
       });
+    });
   };
 
   //Get All Teacher Controller
   GetAllTeachers = (req: Request, res: Response) => {
-    Teacher.find(
-      {},
-      {
-        name: 1,
-        fatherName: 1,
-        dateOfJoining: 1,
-        sex: 1,
-        address: 1,
-        mobile: 1,
-        subject: 1
+    conn.query("SELECT * FROM teachers", (err, teachers) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
+        });
       }
-    )
-
-      .then(Teachers => {
-        if (!Teachers) {
-          return res.status(404).json({
-            error: "There are no Teachers"
-          });
-        }
-        res.json(Teachers);
-      })
-      .catch(err => res.status(404).json(err));
+      if (teachers.length < 1) {
+        return res.status(404).json({
+          error: "No Teacher Found!"
+        });
+      }
+      res.json(teachers);
+    });
   };
   //Get Single Teacher Controller
   GetTeacher = (req: Request, res: Response) => {
-    Teacher.findById(req.query.id, {
-      name: 1,
-      fatherName: 1,
-      DOB: 1,
-      sex: 1,
-      address: 1,
-      mobile: 1,
-      subject: 1,
-      telephone: 1,
-      nationality: 1,
-      dateOfJoining: 1,
-      placeOfBirth: 1
-    })
-
-      .then(teacher => {
-        if (!teacher) {
+    conn.query(
+      "SELECT * FROM teachers WHERE id = ?",
+      req.query.id,
+      (err, teacher) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (teacher.length < 1) {
           return res.status(404).json({
             error: "Teacher not found!"
           });
         }
-        res.json(teacher);
-      })
-      .catch(err => res.status(404).json(err));
+        res.json(teacher[0]);
+      }
+    );
   };
 
   //Update Teacher Controller
@@ -118,51 +81,48 @@ export class teacherController {
       return res.status(400).json(errors);
     }
 
-    const {
-      name,
-      fatherName,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      subject,
-      DOB,
-      dateOfJoining
-    } = req.body;
-
-    const teacherFields = {
-      name,
-      fatherName,
-      DOB,
-      dateOfJoining,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      subject
-    };
-
-    Teacher.findByIdAndUpdate(
-      req.query.id,
-      { $set: teacherFields },
-      { new: true }
-    )
-      .then(teacher => {
-        res.json(teacher);
-      })
-      .catch(err => res.status(404).json(err));
+    const teacherFields = req.body;
+    conn.query(
+      "UPDATE teachers set ? WHERE id = ?",
+      [teacherFields, req.query.id],
+      (err, teacher) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Error in updating  teacher to database, try again."
+          });
+        }
+        if (teacher.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Teacher not found!"
+          });
+        }
+        res.json({
+          message: "Teacher Updated Successfully"
+        });
+      }
+    );
   };
   //Delete Teacher Controller
   DeleteTeacher = (req: Request, res: Response) => {
-    Teacher.findByIdAndDelete(req.query.id)
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch(err => res.status(404).json(err));
+    conn.query(
+      "DELETE FROM teachers WHERE id = ?",
+      req.query.id,
+      (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (result.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Teacher not found!"
+          });
+        }
+        res.json({
+          message: "Teacher deleted Successfully"
+        });
+      }
+    );
   };
 
   //Validate Add Teacher Inputs

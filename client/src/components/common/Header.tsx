@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { signout } from "../../utils/common/helpers";
+import { logoutUser } from "../../actions/authActions";
+import { useDispatch } from "react-redux";
 
 const Header = () => {
+  const dispatch = useDispatch();
   return (
     <nav className="main-header navbar navbar-expand navbar-white navbar-light">
       {/* Left navbar links */}
@@ -13,13 +15,12 @@ const Header = () => {
           </a>
         </li>
       </ul>
-      {/* Right navbar links */}
       <ul className="navbar-nav ml-auto">
         <li className="nav-item d-none d-sm-inline-block flex">
           <Link to="/" className="nav-link">
             <i
               onClick={() => {
-                signout();
+                dispatch(logoutUser());
               }}
               className="fas fa-sign-out-alt"
             ></i>

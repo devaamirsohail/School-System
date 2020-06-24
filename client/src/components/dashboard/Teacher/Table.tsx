@@ -1,76 +1,15 @@
-import React, { useEffect, useState, useContext, useReducer } from "react";
-import axios from "axios";
-import { Alert } from "reactstrap";
+import React, { useState } from "react";
 import Select from "react-select";
-
-//Helpers
-import { getCookie } from "../../../utils/common/helpers";
-import { Link, withRouter, RouteComponentProps } from "react-router-dom";
-
-import { authReducer } from "../../../context/authReducer";
-import authContext from "../../../context/authContext";
-import Spinner from "../../common/Spinner";
+import { Link } from "react-router-dom";
 import Pagination from "../common/Pagination";
 
-const TeacherTable = ({ history }: RouteComponentProps) => {
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
-  const [loading, setLoading] = useState(false);
-  const [allTeachers, setAllTeachers] = useState(context.teachers);
-  const [allSubjects, setAllSubjects] = useState(context.subjects);
-  const { teachers } = context;
-  const [visible, setVisible] = useState(false);
+const TeacherTable = (props: any) => {
+  const { teachers, subjects } = props;
+  const [allTeachers, setAllTeachers] = useState(teachers);
+  const [allSubjects, setAllSubjects] = useState(subjects);
   const [currentPage, setCurrentPage] = useState(1);
   const [teacherPerPage, setTeacherPerPage] = useState(10);
 
-  // Remove Alert
-  const onDismiss = () => setVisible(false);
-  const token = getCookie("token");
-
-  useEffect(() => {
-    setLoading(true);
-    GetAllTeachers();
-    GetAllClasses();
-  }, []);
-  //Get All Teachers
-  const GetAllTeachers = () => {
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/teacher/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.teachers = res.data;
-        setAllTeachers(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
-  //Get All Classes
-  const GetAllClasses = () => {
-    setLoading(true);
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/subject/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.subjects = res.data;
-        setAllSubjects(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
   //Subject dataset for select
   const classOptions = allSubjects.map((val: any) => ({
     value: val.title,
@@ -87,29 +26,7 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
       label: "Female"
     }
   ];
-  //Edit Teacher
-  const handleEdit = (id: string) => {
-    history.push(`/teacher/${id}`);
-  };
-  //Delete Teacher
-  const handleDelete = (id: string) => {
-    axios({
-      method: "DELETE",
-      url: `${process.env.REACT_APP_API}/api/teacher?id=${id}`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.teachers = teachers.filter((teacher: any) => teacher._id !== id);
-        setAllTeachers(state.teachers);
-        setVisible(true);
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+
   //Sorting Ascending
   const handleAscSorting = (str: string) => {
     let ascSortedTeacher = [...allTeachers];
@@ -201,8 +118,8 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
       setAllTeachers(teachers);
     }
   };
-  // Teacher Table
-  const teacherTable = () => (
+
+  return (
     <section className="content">
       <div className="container-fluid">
         <div className="row">
@@ -389,38 +306,42 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
                           </thead>
                           <tbody>
                             {currentTeachers.length > 0 &&
-                              currentTeachers.map((teacher: any, index) => {
-                                return (
-                                  <tr key={index}>
-                                    <td>{teacher.name}</td>
-                                    <td>{teacher.fatherName}</td>
-                                    <td>{teacher.dateOfJoining}</td>
-                                    <td>{teacher.sex}</td>
-                                    <td>{teacher.mobile}</td>
-                                    <td>{teacher.subject}</td>
-                                    <td>
-                                      <i
-                                        onClick={() => handleEdit(teacher._id)}
-                                        className="far fa-edit pr-2"
-                                        style={{
-                                          color: "#28a745",
-                                          cursor: "pointer"
-                                        }}
-                                      ></i>
-                                      <i
-                                        onClick={() =>
-                                          handleDelete(teacher._id)
-                                        }
-                                        className="far fa-trash-alt"
-                                        style={{
-                                          color: "#dc3545",
-                                          cursor: "pointer"
-                                        }}
-                                      ></i>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
+                              currentTeachers.map(
+                                (teacher: any, index: any) => {
+                                  return (
+                                    <tr key={index}>
+                                      <td>{teacher.name}</td>
+                                      <td>{teacher.fatherName}</td>
+                                      <td>{teacher.dateOfJoining}</td>
+                                      <td>{teacher.sex}</td>
+                                      <td>{teacher.mobile}</td>
+                                      <td>{teacher.subject}</td>
+                                      <td>
+                                        <i
+                                          onClick={() =>
+                                            props.handleEdit(teacher._id)
+                                          }
+                                          className="far fa-edit pr-2"
+                                          style={{
+                                            color: "#28a745",
+                                            cursor: "pointer"
+                                          }}
+                                        ></i>
+                                        <i
+                                          onClick={() =>
+                                            props.handleDelete(teacher._id)
+                                          }
+                                          className="far fa-trash-alt"
+                                          style={{
+                                            color: "#dc3545",
+                                            cursor: "pointer"
+                                          }}
+                                        ></i>
+                                      </td>
+                                    </tr>
+                                  );
+                                }
+                              )}
                           </tbody>
                         </table>
                       </div>
@@ -429,7 +350,11 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
                         <div className="row">
                           <div className="col-sm-12 col-md-5">
                             <div className="dataTables_info">
-                              Showing {indexOfFirstTeacher + 1} to{" "}
+                              Showing{" "}
+                              {allTeachers.length < 1
+                                ? "0"
+                                : indexOfFirstTeacher + 1}{" "}
+                              to{" "}
                               {indexOfLastTeacher > allTeachers.length
                                 ? allTeachers.length
                                 : indexOfLastTeacher}{" "}
@@ -459,36 +384,5 @@ const TeacherTable = ({ history }: RouteComponentProps) => {
       {/* /.container-fluid */}
     </section>
   );
-
-  return (
-    <div className="content-wrapper">
-      {/* Content Header (Page header) */}
-      <div className="content-header">
-        <div className="container-fluid">
-          <div className="row mb-2">
-            <div className="col-sm-6">
-              <h1 className="m-0 text-dark">Teachers</h1>
-            </div>
-            {/* /.col */}
-            <div className="col-sm-6">
-              <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item">
-                  <a href="#">Home</a>
-                </li>
-                <li className="breadcrumb-item active">Staff</li>
-              </ol>
-            </div>
-            {/* /.col */}
-          </div>
-          <Alert color="success" isOpen={visible} toggle={onDismiss}>
-            <h4 className="alert-heading">Success</h4>
-            <p>You have successfully deleted the teacher</p>
-          </Alert>
-        </div>
-        {/* /.container-fluid */}
-      </div>
-      {loading ? <Spinner /> : teacherTable()}
-    </div>
-  );
 };
-export default withRouter(TeacherTable);
+export default TeacherTable;

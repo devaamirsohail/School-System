@@ -1,22 +1,19 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
-import Config from "./config";
+// import Config from "./config";
 // Routes
 import routes from "./routes";
 
 class App {
   public app: express.Application;
-  private config = new Config();
   constructor() {
     this.app = express();
-    this.config.loadConfiguration();
     this.initMiddlewares();
     this.initRoutes();
   }
 
   private initMiddlewares(): void {
-    //Middlewares
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(cors());

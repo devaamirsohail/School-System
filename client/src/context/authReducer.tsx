@@ -11,11 +11,7 @@ export const initialState = {
       sex: "",
       address: "",
       mobile: "",
-      classes: "",
-      fee: {
-        total: 0,
-        paid: 0
-      }
+      classes: ""
     }
   ],
   student: {
@@ -29,9 +25,7 @@ export const initialState = {
     address: "",
     telephone: "",
     mobile: "",
-    classes: "",
-    admissionFee: 0,
-    fee: 0
+    classes: ""
   },
   teachers: [
     {
@@ -74,31 +68,7 @@ export const initialState = {
       classes: "",
       subjects: ""
     }
-  ],
-  staff: [
-    {
-      name: "",
-      fatherName: "",
-      dateOfJoining: "",
-      sex: "",
-      address: "",
-      mobile: "",
-      role: ""
-    }
-  ],
-  staffMember: {
-    name: "",
-    fatherName: "",
-    DOB: "",
-    dateOfJoining: "",
-    placeOfBirth: "",
-    sex: "",
-    nationality: "",
-    address: "",
-    telephone: "",
-    mobile: "",
-    role: ""
-  }
+  ]
 };
 
 export const authReducer = (state: any, action: any) => {

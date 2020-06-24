@@ -1,17 +1,16 @@
 import { Request, Response } from "express";
 import Validator from "validator";
 
+import { conn } from "../config/mysql";
+
 //import validator
 import isEmpty from "../validator/is-empty";
-
-//import user model
-import Subject from "../models/Subject";
 
 import { ISubject } from "../Interfaces/subject.interface";
 
 export class subjectController {
   //Add Subject Controller
-  AddSubject = (req: Request, res: Response) => {
+  AddSubject = async (req: Request, res: Response) => {
     const { errors, isValid } = this.validateAddSubjectInput(req.body);
 
     //Check Validation
@@ -19,65 +18,81 @@ export class subjectController {
       return res.status(400).json(errors);
     }
     //Register Controller
-    const { title } = req.body;
-    const newSubject = new Subject({
-      title
-    });
+    const newSubject: ISubject = req.body;
 
-    newSubject
-      .save()
-      .then(user => res.json(user))
-      .catch(err => {
+    conn.query("INSERT INTO subjects SET?", [newSubject], (err, subject) => {
+      if (err) {
         console.log(err);
-        res.json({
-          error: "Error in saving subject to database, try again."
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
         });
+      }
+      res.json({
+        message: "Subject Added Successfully"
       });
+    });
   };
 
   //Get All Subject Controller
   GetAllSubjects = (req: Request, res: Response) => {
-    Subject.find(
-      {},
-      {
-        title: 1
-      }
-    )
+    conn.query("SELECT * FROM subjects", (err, subjects) => {
+      if (err) {
+        console.log(err);
 
-      .then(subjects => {
-        if (!subjects) {
-          return res.status(404).json({
-            error: "There are no subjects"
-          });
-        }
-        res.json(subjects);
-      })
-      .catch(err => res.status(404).json(err));
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
+        });
+      }
+      if (subjects.length < 1) {
+        return res.status(404).json({
+          error: "No Subject Found!"
+        });
+      }
+      res.json(subjects);
+    });
   };
   //Get Single Subject Controller
   GetSubject = (req: Request, res: Response) => {
-    Subject.findById(req.query.id, {
-      title: 1
-    })
-
-      .then(subject => {
-        if (!subject) {
+    conn.query(
+      "SELECT * FROM subjects WHERE id = ?",
+      req.query.id,
+      (err, subject) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (subject.length < 1) {
           return res.status(404).json({
             error: "Subject not found!"
           });
         }
-        res.json(subject);
-      })
-      .catch(err => res.status(404).json(err));
+        res.json(subject[0]);
+      }
+    );
   };
 
   //Delete Subject Controller
   DeleteSubject = (req: Request, res: Response) => {
-    Subject.findByIdAndDelete(req.query.id)
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch(err => res.status(404).json(err));
+    conn.query(
+      "DELETE FROM subjects WHERE id = ?",
+      req.query.id,
+      (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (result.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Subject not found!"
+          });
+        }
+        res.json({
+          success: true
+        });
+      }
+    );
   };
 
   //Validate Add Subject Inputs

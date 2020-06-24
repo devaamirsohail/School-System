@@ -1,18 +1,18 @@
-import React, { useState, useReducer, useContext } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-import { authenticate, isAuth } from "../../utils/common/helpers";
-import { authReducer } from "../../context/authReducer";
-import authContext from "../../context/authContext";
 import { Redirect, RouteComponentProps } from "react-router-dom";
+import { loginUser } from "../../actions/authActions";
 
 const Login = ({ history }: RouteComponentProps) => {
   const [values, setValues] = useState({
     email: "test@test.com",
     password: "123456"
   });
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
+
+  const auth = useSelector((state: any) => state.auth.isAuthenticated);
+  const errors = useSelector((state: any) => state.errors);
+  const dispatch = useDispatch();
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement>
@@ -25,19 +25,7 @@ const Login = ({ history }: RouteComponentProps) => {
       email,
       password
     };
-    axios
-      .post(`${process.env.REACT_APP_API}/api/login`, userData)
-      .then(res => {
-        state.isAuthenticated = true;
-        state.user = res.data.user;
-        authenticate(res, () => {
-          isAuth() ? history.push("/dashboard") : history.push("/");
-        });
-        //history.push('/landing')
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    dispatch(loginUser(userData, history));
   };
   const { email, password } = values;
   const signinForm = () => (
@@ -94,7 +82,7 @@ const Login = ({ history }: RouteComponentProps) => {
       </div>
     </div>
   );
-  const renderFinal = isAuth() ? <Redirect to="/dashboard" /> : signinForm();
+  const renderFinal = auth ? <Redirect to="/dashboard" /> : signinForm();
 
   return <React.Fragment>{renderFinal}</React.Fragment>;
 };

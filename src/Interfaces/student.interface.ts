@@ -9,7 +9,5 @@ export interface IStudent extends Document {
   address: string;
   telephone: string;
   mobile: string;
-  classes: string;
-  admissionFee: { total: Number; paid: Number };
-  fee: { total: Number; paid: Number };
+  section: string;
 }

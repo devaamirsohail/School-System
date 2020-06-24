@@ -1,26 +1,11 @@
-import React, { useState, useEffect, useContext, useReducer } from "react";
-import { Link, RouteComponentProps } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Select from "react-select";
-
 import NumberFormat from "react-number-format";
 //Helpers
-import { getCookie } from "../../../utils/common/helpers";
 
-import { authReducer } from "../../../context/authReducer";
-import authContext from "../../../context/authContext";
-
-import SideBar from "../../common/SideBar";
-import Header from "../../common/Header";
-import Footer from "../../common/Footer";
-import Spinner from "../../common/Spinner";
-
-const TeacherForm = ({ history }: RouteComponentProps) => {
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
-  const [loading, setLoading] = useState(false);
-  const { subjects } = context;
-  const [allSubjects, setAllSubjects] = useState(subjects);
+const TeacherForm = (props: any) => {
+  const { subjects } = props;
   const [teacherData, setTeacherData] = useState({
     name: "",
     fatherName: "",
@@ -48,68 +33,30 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
     mobile,
     subject
   } = teacherData;
-  const token = getCookie("token");
 
-  useEffect(() => {
-    setLoading(true);
-    GetAllSubjects();
-  }, []);
-  // Get All Subjects
-  const GetAllSubjects = () => {
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/subject/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.subjects = res.data;
-        setAllSubjects(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setTeacherData({ ...teacherData, [name]: event.currentTarget.value });
   };
   const handleChangeSelect = (name: string) => (event: any) => {
-    console.log(event);
-
-    setTeacherData({ ...teacherData, [name]: event.value });
+    if (event) {
+      setTeacherData({ ...teacherData, [name]: event.value });
+    }
   };
   //Add New Teacher
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    axios({
-      method: "POST",
-      url: `${process.env.REACT_APP_API}/api/teacher/add`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      data: teacherData
-    })
-      .then(res => {
-        console.log(res);
-        history.push("/teachers");
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    props.AddTeacher(teacherData);
   };
+
   // Subject Dataset for select
-  const subjectOptions = allSubjects.map((val: any) => ({
+  const subjectOptions = subjects.map((val: any) => ({
     value: val.title,
     label: val.title
   }));
 
-  // Teacher Form
-  const AddForm = () => (
+  return (
     <div className="content-wrapper">
       <section className="content-header">
         <div className="container-fluid">
@@ -127,22 +74,16 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
             </div>
           </div>
         </div>
-        {/* /.container-fluid */}
       </section>
-
       <section className="content">
         <div className="container-fluid">
-          {/* general form elements */}
           <div className="card card-primary">
             <div className="card-header">
               <h3 className="card-title">Teacher Form</h3>
             </div>
-            {/* /.card-header */}
-            {/* form start */}
             <form role="form">
               <div className="card-body">
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Name</label>
                     <input
@@ -175,7 +116,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Place of Birth</label>
                     <input
@@ -198,7 +138,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Sex</label>
                     <div className="form-group clearfix row">
@@ -248,10 +187,7 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                         onChange={handleChange("DOB")}
                       />
                     </div>
-
-                    {/* /.input group */}
                   </div>
-
                   <div className="form-group col-md-4">
                     <label>Date of Joining:</label>
                     <div className="input-group">
@@ -272,7 +208,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
                 <div className="row">
-                  {/* left column */}
                   <div className="form-group col-md-4">
                     <label>Telephone</label>
                     <div className="input-group">
@@ -309,7 +244,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                   </div>
                   <div className="form-group col-md-4">
                     <label>Subject:</label>
-
                     <Select
                       //defaultValue={classOptions}
                       className="basic-single"
@@ -323,7 +257,6 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
                   </div>
                 </div>
               </div>
-              {/* /.card-body */}
               <div className="card-footer">
                 <button
                   type="submit"
@@ -336,19 +269,8 @@ const TeacherForm = ({ history }: RouteComponentProps) => {
             </form>
           </div>
         </div>
-
-        {/* /.container-fluid */}
       </section>
     </div>
-  );
-
-  return (
-    <React.Fragment>
-      <Header />
-      <SideBar />
-      {loading ? <Spinner /> : AddForm()}
-      <Footer />
-    </React.Fragment>
   );
 };
 export default TeacherForm;

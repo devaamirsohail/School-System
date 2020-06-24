@@ -1,76 +1,16 @@
-import React, { useEffect, useState, useContext, useReducer } from "react";
-import axios from "axios";
-import { Alert } from "reactstrap";
+import React, { useState } from "react";
 import Select from "react-select";
-
-//Helpers
-import { getCookie } from "../../../utils/common/helpers";
-import { Link, withRouter, RouteComponentProps } from "react-router-dom";
-
-import { authReducer } from "../../../context/authReducer";
-import authContext from "../../../context/authContext";
-import Spinner from "../../common/Spinner";
+import { Link } from "react-router-dom";
 import Pagination from "../common/Pagination";
 
-const StudentTable = ({ history }: RouteComponentProps) => {
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
-  const [loading, setLoading] = useState(false);
-  const [allStudents, setAllStudents] = useState(context.students);
-  const [allClasses, setAllClasses] = useState(context.classes);
-  const { students } = context;
-  const [visible, setVisible] = useState(false);
+const StudentTable = (props: any) => {
+  const { students, classes, sections } = props;
+  const [allStudents, setAllStudents] = useState(students);
+  const [allClasses, setAllClasses] = useState(classes);
+  const [allSections, setAllSections] = useState(sections);
   const [currentPage, setCurrentPage] = useState(1);
   const [studentPerPage, setStudentPerPage] = useState(10);
 
-  // Remove Alert
-  const onDismiss = () => setVisible(false);
-  const token = getCookie("token");
-
-  useEffect(() => {
-    setLoading(true);
-    GetAllStudents();
-    GetAllClasses();
-  }, []);
-  //Get All Students
-  const GetAllStudents = () => {
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/student/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.students = res.data;
-        setAllStudents(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
-  //Get All Classes
-  const GetAllClasses = () => {
-    setLoading(true);
-    axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/class/all`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.classes = res.data;
-        setAllClasses(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
   //Class dataset for select
   const classOptions = allClasses.map((val: any) => ({
     value: val.title,
@@ -87,29 +27,7 @@ const StudentTable = ({ history }: RouteComponentProps) => {
       label: "Female"
     }
   ];
-  //Edit Student
-  const handleEdit = (id: string) => {
-    history.push(`/student/${id}`);
-  };
-  //Delete Student
-  const handleDelete = (id: string) => {
-    axios({
-      method: "DELETE",
-      url: `${process.env.REACT_APP_API}/api/student?id=${id}`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        state.students = students.filter((student: any) => student._id !== id);
-        setAllStudents(state.students);
-        setVisible(true);
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+
   //Sorting Ascending
   const handleAscSorting = (str: string) => {
     let ascSortedStudent = [...allStudents];
@@ -201,8 +119,8 @@ const StudentTable = ({ history }: RouteComponentProps) => {
       setAllStudents(students);
     }
   };
-  // Student Table
-  const studentTable = () => (
+
+  return (
     <section className="content">
       <div className="container-fluid">
         <div className="row">
@@ -245,7 +163,6 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                 />
                               </td>
                               <td></td>
-
                               <td>
                                 <Select
                                   className="basic-single "
@@ -265,9 +182,6 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                   onChange={handleSearchByMobile}
                                 />
                               </td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
                               <td colSpan={2}>
                                 <Select
                                   className="basic-single"
@@ -367,74 +281,83 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                                   }}
                                 />
                               </th>
-                              <th>Fee</th>
-                              <th>Paid</th>
-                              <th>Balance</th>
                               <th>
-                                Class
+                                Section
                                 <i
-                                  onClick={() => handleAscSorting("classes")}
+                                  onClick={() => handleAscSorting("section")}
                                   className="fas fa-arrow-up fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
                                   }}
                                 />
                                 <i
-                                  onClick={() => handleDesSorting("classes")}
+                                  onClick={() => handleDesSorting("section")}
                                   className="fas fa-arrow-down fa-xs float-right"
                                   style={{
                                     cursor: "pointer"
                                   }}
                                 />
                               </th>
+                              <th>Class</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
                             {currentStudents.length > 0 &&
-                              currentStudents.map((student: any, index) => {
-                                return (
-                                  <tr key={index}>
-                                    <td>{student.name}</td>
-                                    <td>{student.fatherName}</td>
-                                    <td>{student.DOB}</td>
-                                    <td>{student.sex}</td>
-                                    <td>{student.mobile}</td>
-                                    <td>
-                                      {student.fee ? student.fee.total : 0}
-                                    </td>
-                                    <td>
-                                      {student.fee ? student.fee.paid : 0}
-                                    </td>
-                                    <td>
-                                      {student.fee
-                                        ? student.fee.total - student.fee.paid
-                                        : 0}
-                                    </td>
-                                    <td>{student.classes}</td>
-                                    <td>
-                                      <i
-                                        onClick={() => handleEdit(student._id)}
-                                        className="far fa-edit pr-2"
-                                        style={{
-                                          color: "#28a745",
-                                          cursor: "pointer"
-                                        }}
-                                      ></i>
-                                      <i
-                                        onClick={() =>
-                                          handleDelete(student._id)
-                                        }
-                                        className="far fa-trash-alt"
-                                        style={{
-                                          color: "#dc3545",
-                                          cursor: "pointer"
-                                        }}
-                                      ></i>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
+                              currentStudents.map(
+                                (student: any, index: any) => {
+                                  return (
+                                    <tr key={index}>
+                                      <td>{student.name}</td>
+                                      <td>{student.fatherName}</td>
+                                      <td>{student.DOB}</td>
+                                      <td>{student.sex}</td>
+                                      <td>{student.mobile}</td>
+                                      {allSections.map(
+                                        (section: any, index: string) =>
+                                          section.id === student.section ? (
+                                            <td key={index}>{section.title}</td>
+                                          ) : null
+                                      )}
+                                      {allSections.map((section: any) =>
+                                        section.id === student.section
+                                          ? allClasses.map(
+                                              (aClass: any, index: string) =>
+                                                aClass.id ===
+                                                section.classes ? (
+                                                  <td key={index}>
+                                                    {aClass.title}
+                                                  </td>
+                                                ) : null
+                                            )
+                                          : null
+                                      )}
+                                      <td>
+                                        <i
+                                          onClick={() =>
+                                            props.handleEdit(student.id)
+                                          }
+                                          className="far fa-edit pr-2"
+                                          style={{
+                                            color: "#28a745",
+                                            cursor: "pointer"
+                                          }}
+                                        ></i>
+                                        <i
+                                          onClick={() =>
+                                            props.handleDelete(student.id)
+                                          }
+                                          className="far fa-trash-alt"
+                                          style={{
+                                            color: "#dc3545",
+                                            cursor: "pointer"
+                                          }}
+                                        ></i>
+                                      </td>
+                                    </tr>
+                                  );
+                                }
+                              )}
                           </tbody>
                         </table>
                       </div>
@@ -443,7 +366,11 @@ const StudentTable = ({ history }: RouteComponentProps) => {
                         <div className="row">
                           <div className="col-sm-12 col-md-5">
                             <div className="dataTables_info">
-                              Showing {indexOfFirstStudent + 1} to{" "}
+                              Showing{" "}
+                              {allStudents.length < 1
+                                ? "0"
+                                : indexOfFirstStudent + 1}{" "}
+                              to{" "}
                               {indexOfLastStudent > allStudents.length
                                 ? allStudents.length
                                 : indexOfLastStudent}{" "}
@@ -473,36 +400,5 @@ const StudentTable = ({ history }: RouteComponentProps) => {
       {/* /.container-fluid */}
     </section>
   );
-
-  return (
-    <div className="content-wrapper">
-      {/* Content Header (Page header) */}
-      <div className="content-header">
-        <div className="container-fluid">
-          <div className="row mb-2">
-            <div className="col-sm-6">
-              <h1 className="m-0 text-dark">Students</h1>
-            </div>
-            {/* /.col */}
-            <div className="col-sm-6">
-              <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item">
-                  <a href="#">Home</a>
-                </li>
-                <li className="breadcrumb-item active">Sudents</li>
-              </ol>
-            </div>
-            {/* /.col */}
-          </div>
-          <Alert color="success" isOpen={visible} toggle={onDismiss}>
-            <h4 className="alert-heading">Success</h4>
-            <p>You have successfully deleted the student</p>
-          </Alert>
-        </div>
-        {/* /.container-fluid */}
-      </div>
-      {loading ? <Spinner /> : studentTable()}
-    </div>
-  );
 };
-export default withRouter(StudentTable);
+export default StudentTable;

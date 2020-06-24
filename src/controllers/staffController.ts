@@ -6,6 +6,7 @@ import isEmpty from "../validator/is-empty";
 
 //import user model
 import Staff from "../models/Staff";
+import { conn } from "../config/mysql";
 
 import { IStaff } from "../Interfaces/staff.interface";
 
@@ -18,95 +19,56 @@ export class staffController {
     if (isValid.includes(false)) {
       return res.status(400).json(errors);
     }
-    //Register Controller
-    const {
-      name,
-      fatherName,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      role,
-      DOB,
-      dateOfJoining
-    } = req.body;
-    const newStaff = new Staff({
-      name,
-      fatherName,
-      DOB,
-      dateOfJoining,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      role
-    });
+    const staffFields: IStaff = req.body;
 
-    newStaff
-      .save()
-      .then(user => res.json(user))
-      .catch(err => {
+    conn.query("INSERT INTO staff SET?", [staffFields], (err, staff) => {
+      if (err) {
         console.log(err);
-        res.json({
+        return res.status(500).json({
           error: "Error in saving staff to database, try again."
         });
+      }
+      res.json({
+        message: "Staff Added Successfully"
       });
+    });
   };
 
   //Get All Staff Controller
   GetAllStaff = (req: Request, res: Response) => {
-    Staff.find(
-      {},
-      {
-        name: 1,
-        fatherName: 1,
-        dateOfJoining: 1,
-        sex: 1,
-        address: 1,
-        mobile: 1,
-        role: 1
+    conn.query("SELECT * FROM staff", (err, Staff) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
+        });
       }
-    )
-
-      .then(Staff => {
-        if (!Staff) {
-          return res.status(404).json({
-            error: "There are no Staff"
-          });
-        }
-        res.json(Staff);
-      })
-      .catch(err => res.status(404).json(err));
+      if (Staff.length < 1) {
+        return res.status(404).json({
+          error: "No Staff Found!"
+        });
+      }
+      res.json(Staff);
+    });
   };
   //Get Single Staff Controller
   GetStaff = (req: Request, res: Response) => {
-    Staff.findById(req.query.id, {
-      name: 1,
-      fatherName: 1,
-      DOB: 1,
-      sex: 1,
-      address: 1,
-      mobile: 1,
-      role: 1,
-      telephone: 1,
-      nationality: 1,
-      dateOfJoining: 1,
-      placeOfBirth: 1
-    })
-
-      .then(staff => {
-        if (!staff) {
+    conn.query(
+      "SELECT * FROM staff WHERE id = ?",
+      req.query.id,
+      (err, staff) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (staff.length < 1) {
           return res.status(404).json({
             error: "Staff not found!"
           });
         }
-        res.json(staff);
-      })
-      .catch(err => res.status(404).json(err));
+        res.json(staff[0]);
+      }
+    );
   };
 
   //Update Staff Controller
@@ -118,47 +80,49 @@ export class staffController {
       return res.status(400).json(errors);
     }
 
-    const {
-      name,
-      fatherName,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      role,
-      DOB,
-      dateOfJoining
-    } = req.body;
+    const staffFields: IStaff = req.body;
 
-    const staffFields = {
-      name,
-      fatherName,
-      DOB,
-      dateOfJoining,
-      placeOfBirth,
-      sex,
-      nationality,
-      address,
-      telephone,
-      mobile,
-      role
-    };
-
-    Staff.findByIdAndUpdate(req.query.id, { $set: staffFields }, { new: true })
-      .then(staff => {
-        res.json(staff);
-      })
-      .catch(err => res.status(404).json(err));
+    conn.query(
+      "UPDATE staff set ? WHERE id = ?",
+      [staffFields, req.query.id],
+      (err, staff) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Error in updating  staff to database, try again."
+          });
+        }
+        if (staff.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Staff not found!"
+          });
+        }
+        res.json({
+          message: "Staff Updated Successfully"
+        });
+      }
+    );
   };
   //Delete Staff Controller
   DeleteStaff = (req: Request, res: Response) => {
-    Staff.findByIdAndDelete(req.query.id)
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch(err => res.status(404).json(err));
+    conn.query(
+      "DELETE FROM staff WHERE id = ?",
+      req.query.id,
+      (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (result.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Staff not found!"
+          });
+        }
+        res.json({
+          message: "Staff deleted Successfully"
+        });
+      }
+    );
   };
 
   //Validate Add Staff Inputs

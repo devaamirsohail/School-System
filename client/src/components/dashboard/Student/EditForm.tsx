@@ -1,114 +1,75 @@
-import React, { useState, useEffect, useContext, useReducer } from "react";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Select from "react-select";
-
 import NumberFormat from "react-number-format";
 //Helpers
 
-import { authReducer } from "../../../context/authReducer";
-import authContext from "../../../context/authContext";
-
-import SideBar from "../../common/SideBar";
-import Header from "../../common/Header";
-import Footer from "../../common/Footer";
-import Spinner from "../../common/Spinner";
-
-type TParams = { id: string };
-const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
-  const context = useContext(authContext);
-  const [state] = useReducer(authReducer, context);
-  const [loading, setLoading] = useState(false);
-  const { staffMember } = context;
-  const [staffData, setStaffData] = useState({
-    name: staffMember.name,
-    fatherName: staffMember.fatherName,
-    DOB: staffMember.DOB,
-    dateOfJoining: staffMember.dateOfJoining,
-    placeOfBirth: staffMember.placeOfBirth,
-    sex: staffMember.sex,
-    nationality: staffMember.nationality,
-    address: staffMember.address,
-    telephone: staffMember.telephone,
-    mobile: staffMember.mobile,
-    role: staffMember.role
+const StudentForm = (props: any) => {
+  const { allClasses, student } = props;
+  const [studentData, setStudentData] = useState({
+    name: student.name,
+    fatherName: student.fatherName,
+    DOB: student.DOB,
+    dateOfAdmission: student.dateOfAdmission,
+    placeOfBirth: student.placeOfBirth,
+    sex: student.sex,
+    nationality: student.nationality,
+    address: student.address,
+    telephone: student.telephone,
+    mobile: student.mobile,
+    classes: student.classes
   });
-  const id = match.params.id;
+
   const {
     name,
     fatherName,
     DOB,
-    dateOfJoining,
+    dateOfAdmission,
     placeOfBirth,
     sex,
     nationality,
     address,
     telephone,
     mobile,
-    role
-  } = staffData;
-  useEffect(() => {
-    GetStaff();
-  }, []);
-
-  // Get Staff By Id
-  const GetStaff = async () => {
-    setLoading(true);
-
-    await axios({
-      method: "GET",
-      url: `${process.env.REACT_APP_API}/api/staff?id=${id}`
-    })
-      .then(res => {
-        state.staffMember = res.data;
-        setStaffData(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err);
-      });
-  };
+    classes
+  } = studentData;
 
   const handleChange = (name: string) => (
     event: React.FormEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setStaffData({ ...staffData, [name]: event.currentTarget.value });
+    setStudentData({ ...studentData, [name]: event.currentTarget.value });
   };
-
-  //Update Staff
+  const handleChangeSelect = (name: string) => (event: any) => {
+    if (event) {
+      setStudentData({ ...studentData, [name]: event.value });
+    }
+  };
+  //Add New Student
   const handleSubmit = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    axios({
-      method: "PUT",
-      url: `${process.env.REACT_APP_API}/api/staff?id=${id}`,
-
-      data: staffData
-    })
-      .then(res => {
-        console.log(res);
-        history.push("/staff");
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    props.AddStudent(studentData);
   };
 
-  // Staff Form
-  const EditForm = () => (
+  // Class Dataset for select
+  const classOptions = allClasses.map((val: any) => ({
+    value: val.title,
+    label: val.title
+  }));
+
+  return (
     <div className="content-wrapper">
       <section className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Update Staff</h1>
+              <h1>Update Student</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item">
                   <Link to="/dashboard">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Update Staff</li>
+                <li className="breadcrumb-item active">Update Student</li>
               </ol>
             </div>
           </div>
@@ -121,7 +82,7 @@ const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
           {/* general form elements */}
           <div className="card card-primary">
             <div className="card-header">
-              <h3 className="card-title">Staff Form</h3>
+              <h3 className="card-title">Student Form</h3>
             </div>
             {/* /.card-header */}
             {/* form start */}
@@ -239,7 +200,7 @@ const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
                   </div>
 
                   <div className="form-group col-md-4">
-                    <label>Date of Joining</label>
+                    <label>Date of Admission</label>
                     <div className="input-group">
                       <div className="input-group-prepend">
                         <span className="input-group-text">
@@ -251,8 +212,8 @@ const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
                         format="##-##-####"
                         placeholder="DD-MM-YYYY"
                         mask={["D", "D", "M", "M", "Y", "Y", "Y", "Y"]}
-                        value={dateOfJoining}
-                        onChange={handleChange("dateOfJoining")}
+                        value={dateOfAdmission}
+                        onChange={handleChange("dateOfAdmission")}
                       />
                     </div>
                   </div>
@@ -293,16 +254,23 @@ const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
                       />
                     </div>
                   </div>
-
                   <div className="form-group col-md-4">
-                    <label>Role:</label>
-
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Role"
-                      value={role}
-                      onChange={handleChange("role")}
+                    <label>Class</label>
+                    <Select
+                      defaultValue={
+                        classOptions[
+                          classOptions.findIndex(
+                            (aClass: any) => aClass.value === student.classes
+                          )
+                        ]
+                      }
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isClearable
+                      isSearchable
+                      name="color"
+                      options={classOptions}
+                      onChange={handleChangeSelect("classes")}
                     />
                   </div>
                 </div>
@@ -325,14 +293,5 @@ const EditStaff = ({ history, match }: RouteComponentProps<TParams>) => {
       </section>
     </div>
   );
-
-  return (
-    <React.Fragment>
-      <Header />
-      <SideBar />
-      {loading ? <Spinner /> : EditForm()}
-      <Footer />
-    </React.Fragment>
-  );
 };
-export default withRouter(EditStaff);
+export default StudentForm;

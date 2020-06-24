@@ -6,13 +6,13 @@ import isEmpty from "../validator/is-empty";
 
 //import user model
 import Classes from "../models/Classes";
+import { conn } from "../config/mysql";
 
 import { IClass } from "../Interfaces/classes.interface";
 
 export class classController {
   //Add Class Controller
   AddClass = (req: Request, res: Response) => {
-    console.log(req.body);
     const { errors, isValid } = this.validateAddClassInput(req.body);
 
     //Check Validation
@@ -21,61 +21,57 @@ export class classController {
     }
 
     //Register Controller
-    const classFields = {
-      title: req.body.title,
-      HOC: req.body.HOC
-    };
-
-    const newClasses = new Classes(classFields);
-    newClasses
-      .save()
-      .then(user => res.json(user))
-      .catch(err => {
+    const classFields: IClass = req.body;
+    conn.query("INSERT INTO classes SET?", [classFields], (err, classes) => {
+      if (err) {
         console.log(err);
-        res.json({
-          error: "Error in saving classes to database, try again."
+        return res.status(500).json({
+          error: "Error in saving class to database, try again."
         });
+      }
+      res.json({
+        message: "Class Added Successfully"
       });
+    });
   };
 
   //Get All Classes Controller
   GetAllClasses = (req: Request, res: Response) => {
-    Classes.find(
-      {},
-      {
-        title: 1,
-        HOC: 1,
-        section: 1
+    conn.query("SELECT * FROM classes", (err, classes) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Something went wrong, try again!"
+        });
       }
-    )
-
-      .then(classess => {
-        if (!classess) {
-          return res.status(404).json({
-            error: "There are no classess"
-          });
-        }
-        res.json(classess);
-      })
-      .catch(err => res.status(404).json(err));
+      if (classes.length < 1) {
+        return res.status(404).json({
+          error: "Class not found!"
+        });
+      }
+      console.log(err);
+      res.json(classes);
+    });
   };
   //Get Single Classes Controller
   GetClass = (req: Request, res: Response) => {
-    Classes.findById(req.query.id, {
-      title: 1,
-      HOC: 1,
-      section: 1
-    })
-
-      .then(classes => {
-        if (!classes) {
-          return res.status(404).json({
-            error: "Classes not found!"
+    conn.query(
+      "SELECT * FROM classes WHERE id = ?",
+      req.query.id,
+      (err, classes) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
           });
         }
-        res.json(classes);
-      })
-      .catch(err => res.status(404).json(err));
+
+        if (classes.length < 1) {
+          return res.status(404).json({
+            error: "Class not found!"
+          });
+        }
+        res.json(classes[0]);
+      }
+    );
   };
 
   //Update Classes Controller
@@ -88,45 +84,56 @@ export class classController {
     }
 
     //Register Controller
-    let classFields: any = {
-      title: req.body.title,
-      HOC: req.body.HOC
-    };
-
-    Classes.findByIdAndUpdate(
-      req.query.id,
-      { $set: classFields },
-      { new: true }
-    )
-      .then(classes => {
+    let classFields: IClass = req.body;
+    conn.query(
+      "UPDATE classes set ? WHERE id = ?",
+      [classFields, req.query.id],
+      (err, classes) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (classes.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Class not found!"
+          });
+        }
         res.json(classes);
-      })
-      .catch(err => res.status(404).json(err));
+      }
+    );
   };
   //Delete Classes Controller
   DeleteClass = (req: Request, res: Response) => {
-    Classes.findByIdAndDelete(req.query.id)
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch(err => res.status(404).json(err));
+    conn.query(
+      "DELETE FROM classes WHERE id = ?",
+      req.query.id,
+      (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Something went wrong, try again!"
+          });
+        }
+        if (result.affectedRows < 1) {
+          return res.status(404).json({
+            error: "Class not found!"
+          });
+        }
+        res.json({
+          message: "Class deleted Successfully"
+        });
+      }
+    );
   };
-
   //Validate Add Classes Inputs
   validateAddClassInput = (data: IClass): any => {
     let errors = {
-      title: "",
-      HOC: ""
+      title: ""
     };
     data.title = !isEmpty(data.title) ? data.title : "";
-    data.HOC = !isEmpty(data.HOC) ? data.HOC : "";
 
     if (Validator.isEmpty(data.title)) {
       errors.title = "Title is required";
-    }
-
-    if (Validator.isEmpty(data.HOC)) {
-      errors.HOC = "Head of Class is required";
     }
 
     return {
