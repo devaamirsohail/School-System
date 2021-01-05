@@ -19,7 +19,7 @@
     "@types/reactstrap": "^8.4.1",
     "@types/redux": "^3.6.0",
     "@types/redux-thunk": "^2.1.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "chart.js": "^2.8.0",
     "classnames": "^2.2.6",
