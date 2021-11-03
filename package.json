@@ -33,7 +33,7 @@
     "react-select": "^3.0.8",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
-    "validator": "^12.1.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
